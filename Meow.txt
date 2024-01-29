@@ -1,0 +1,38 @@
+To attack the target machine, you must be on the same network.
+
+Hack The Box uses OpenVPN. First task is to connect to it
+
+When first starting a penetration test or any security evaluation on a target, a primary step is known as Enumeration.
+
+This step consists of documenting the current state of the target to learn as much as
+possible about it.
+
+When you are connected to the VPN as the target host:
+If the target machine is a web server, running a web page, you can navigate to its IP address to see what the page contains. 
+If the target is a storage server, you can connect to it using the same IP address to
+explore the files and folders stored on it, provided that you have the necessary credentials. 
+
+However, we will take a lot of time if we manually search for them.
+
+Every server uses ports in order to serve data to clients.
+The first step of Enumeration is to scan for open ports. Here they use nmap.
+
+Open ports => can manually check if you have access. Different services => require different technologies to access.
+
+Here, it is important to note that it is not practical to know everything. So we just have to know what is necessary, and to know what is necessary.
+----------------------------------------------------------------------------------
+The command ping: sends a packet. Checks for response.
+It uses an ICMP echo request.
+For now, i understand it as a troubleshooting tool.
+
+nmap -sV: -s is type of scan, -V is verbose output.
+
+Running nmap on the given target machine, we can see that port 23 is open; telnet.
+
+Telnet gives a sort of terminal for clients to interact with the server.
+Usually, it has username and password requirements for enhanced security.
+
+In the exercise, it is informed that one can use a brute-force approach, iterating through possibilities in an attempt to log in.
+
+Here, we telnet the IP address, login using the information in the task list and there is the flag.txt. cat flag.txt gives us the flag:
+b40abdfe23665f766f9c61ecba8a4c19
