@@ -1,0 +1,77 @@
+There are a few protocols used to transfer file between two hosts (computers)
+on the same network.
+
+This exercise involves introducing SMB: Server Message Block.
+This is a network file-sharing protocol.
+
+This communication provides a shared access to files, printers and serial ports
+between endpoints on a network
+
+Most of the time, Windows machines use this protocol.
+
+A port is reserved for this protocol, typically 445.
+
+SMB runs on Application or Presentation layers of the OSI model.
+It relies on lower-level protocols for transport.
+
+Difference between SMB and FTP:
+SMB is primarily used for sharing files, printers, and other resources within a local network environment
+, particularly in Windows-based networks.
+The key word part of SMB is local network environment
+
+FTP is OS-independent. FTP is more-of between a client and server.
+
+An SMB-enabled storage on the network is called a share.
+These can be accessed by any client that has the address of the server and the proper credentials.
+
+SMB requires some security layers to function appropriately within a network topology.
+
+SMB clients are required to provide a username/password combination to see or interact with the contents
+of the SMB share.
+
+To access, we do the same Enumeration first: ping => nmap to scan for open ports.
+
+In the exercise, the port 445 is open for us to enter.
+The exercise uses smbclient
+
+The smbclient acts like a client: it will prompt you to enter the authentication details if the remote host
+requires you to enter.
+If left blank, it will use your local machine's username as a default.
+
+Logging in via smbclient -L with the ip address, -L sets the target, we get
+4 shares: 4 resources
+
+Explanation of basic 4 shares:
+ADMIN$ - Administrative shares are hidden network shares created by the Windows NT family of
+operating systems that allow system administrators to have remote access to every disk volume on a
+network-connected system. These shares may not be permanently deleted but may be disabled.
+C$ - Administrative share for the C:\ disk volume. This is where the operating system is hosted.
+IPC$ - The inter-process communication share. Used for inter-process communication via named
+pipes and is not part of the file system.
+WorkShares - Custom share.
+
+Each share will have its own credentials required:
+Trying to access ADMIN$: via smbclient \\\\ the ip address \\ ADMIN$, we get an error message:
+NT_STATUS_ACCESS_DENIED
+which informs us that we have no rights to access it.
+
+Regarding why there are 4 escape characters - slashes, it is because:
+To escape a backslash or two for the four backslashes and
+We intend to send this: smbclient\\server\share
+Also, double slashes (\\) in Linux informs it that you are specifying another location NOT in your
+computer: https://www.reddit.com/r/HowToHack/comments/n0qavy/how_do_i_know_how_many_slashes_to_put_at_the/
+
+The connections all fail, except the last one: WorkShares. This suggests that the WorkShares SMB share WorkShares
+poorly configured.
+
+When we are logged in: ls
+shows two folders: Amy.J and James.P
+
+cd into both; we find the flag.txt in James.P
+
+we can do the same steps as the previous exercise: use "get" to file transfer the flag
+
+cat flag.txt gives
+
+5f61c10dffbc77a704d76016a22f1664
+
