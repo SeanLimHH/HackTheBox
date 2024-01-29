@@ -1,0 +1,44 @@
+The task is FTP: used for transferring files.
+
+FTP is often secured with SSL/TLS (FTPS) or replaced with SSH File Transfer Protocol (SFTP).
+
+A port running an active service is reserved to receive requests and send results from.
+This enables multiple active services to be ran - on different ports. 
+
+SSH is an active service on another port existing simultaneously with FTP.
+Even if the client connects to the server via SSH: the files transferred from server
+to the FTP port is not encrypted and is in plaintext. 
+
+It is possible for a Man in the Middle attack to occur here on communication between
+FTP port and the server when files are being transferred; despite SSH connection with server.
+
+Hence, it is important to encrypt the files transferred from the FTP port.
+
+This means that the files are transferred from the SSH port: the FTP protocol gets moved 
+into the SSH port:
+it becomes secured from any interception.
+
+FTP usually sits on port 21
+----------------------------------------------------------------------------------
+
+Ping does not usually work against big corporations, and firewalls can have rules to prevent
+pinging between hosts.
+
+In this task, it is simpler: connecting to an FTP server.
+
+We use FTP command to connect to the virtual machine.
+
+A typical misconfiguration of FTP, just like in the exercise: uses the default username anonymous.
+It enables anonymous accounts to access the FTP service just like any authenticated user.
+So it will disregard any password.
+
+In this case, i input the username anonymous and any password.
+
+Logging in, we use ls to list the files. There is flag.txt.
+
+Then the task is to download it: using "get" command. This downloads the file to the
+same location which i called the FTP command.
+
+Exiting, we check the flag: cat flag.txt:
+
+The flag: 035db21c881520061c53e0536e44f815
