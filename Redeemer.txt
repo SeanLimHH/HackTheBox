@@ -1,0 +1,30 @@
+One form of database is called Redis.
+This database stores data in the RAM. This means that the data is not persistent.
+
+Because it is in the primary memory, retrieval of it is faster than in disks.
+
+A term for such a database is called in-memory.
+
+In-memory databases like Redis usually cache data that is required frequently.
+
+The idea is this: there is a traditional database behind the scenes, and Redis.
+
+Data that is frequently being requested: pull from traditional database and put into Redis.
+
+The exercise attempts to enumerate a Redis server remotely then dumping the database to retrieve a flag.
+
+The redis-cli command line utility is being used.
+
+We use ping > nmap to scan for services : nmap -p- sV
+-p- suggests that all ports should be scanned.
+
+-sV means scan type is should scan for version of the services running on the ports.
+
+Running the scan on the virtual machine, we see that Redis is open on port 6379. Version is 5.0.7
+
+Using redis-tools cli, we connect to the service. Typing info in the cli provides us
+information in the shell, regarding information of the database.
+
+Under the keyspace section lists the databases. We see only 1. To access, one can call "select 0"
+To list all keys in the database: keys *
+Then we call "get "flag"" to get the flag: 03e1d2b376c37ab3f5319922053953eb
