@@ -1,0 +1,75 @@
+This is the start of the second tier of introduction.
+
+For this exercise, we are dealing with web application.
+Specifically, the exercise introduces SQL injection against an SQL Database enabled web application.
+
+Target is running a website; backend database containing searchable items.
+
+SQL service typical operation:
+1. User logs in successfully
+2. Give user his rights to restricted parts of website
+3. Give user an authentication token or cookie to inform the database that the user
+is rightfully still on the webpage.
+4. User will search for an item.
+5. The web application receives the user request, processes it, error checks it, checks for authentication rights
+6. If all checks passes, the web application will send a SQL query on behalf of the user to fetch results
+7. Database sends results to web application which sends it to the user (client-side).
+
+nmap -sC is introduced here. This parameter enable scanning default set of scripts.
+The caveat is that some of the scripts in the set are malicious.
+
+Running the command nmap -sC -sV with the virtual machine, we get port 80 open:
+http-server-header and http-title.
+
+PORT   STATE SERVICE VERSION
+80/tcp open  http    Apache httpd 2.4.38 ((Debian))
+|_http-server-header: Apache/2.4.38 (Debian)
+|_http-title: Login
+
+Apache HTTP server is an open-source free application that runs web pages on either physical or virtual web servers.
+It is very popular, runs on standard ports like 80 TCP, 443 TCP.
+The "TCP" postfix is to inform that TCP is expected to be used on these ports, by the server.
+
+Visiting the IP address will open up the login page. (Service on port 80)
+
+At this point, one approach suggested is to brute force the login details. But not a focus of this task.
+
+Moving on, we have no information regarding user details.
+A suggestion is to continue enumeration: check for other directories or useful pages.
+
+The analogy for web directories are "web folders". Different folders have different files.
+
+At this stage, the tutorial mentions about web requests. Since i know about them, the summary is:
+1. Using error codes as a feedback: use tools to navigate the get query parameters.
+1a. If the error code is 200: found; 404: not found..
+1b. However, I think that it is possible for the web developer to intentional mess up the error codes or
+misrepresent. More specifically, it is possible for the web developer to have the server response be 200
+even if the address is found. Here, the assumption is that the developer is following conventions
+
+2. Some tools that can be used: Gobuster or Dirbuster (brute forces URLs) or dirb (uses dictionary to test URLs)
+
+The exercise uses Gobuster: installing it and then using a word list: running gobuster,
+we get no results.
+
+This suggests that we need another approach.
+
+The exercise suggests trying default common credentials, like admin, guest, root for username
+and password: password.
+This fails, and if fails, we need another approach.
+This exercise then introduces SQL injection here:
+1. With the login page: the server runs on PHP: '#' is a comment.
+2. We guess that there is an admin user with "admin" username
+3. Because when we click "Log in", if unsanitised, there is SQL query sent to the database to fetch
+the username. This is processed by the backend web application. 
+4. If the web application did not use regular expression to parse the username and or passwords,
+the query would exist in the form of (PHP): $sql="SELECT * FROM users WHERE username='$username' AND password='$password'";
+5. This means, if the username field ends with a comment symbol in PHP, we can escape and ignore subsequent characters in the line.
+6. So by inputting: admin'#, we terminate the SQL query string after character n of 'admin', then the comment
+will ignore all other subsequent characters in the line.
+7. The backend will send a query to the database
+SELECT * FROM users WHERE username ='admin'
+and thus return the admin account authenticated.
+
+Note: There needs to be something in the password field as the backend code checks for password
+
+The flag is thus: e3d0796d002a446c0e622226f42e9672
