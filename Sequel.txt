@@ -1,0 +1,32 @@
+This exercise will focus on communicating with the SQL service directly without going
+through the web application.
+
+Enumerate: nmap -sC and -sV
+This time -sC will run a default set of scripts, some of which are considered intrusive.
+But allowed in this exercise. -sV is scan type version to detect version of services.
+
+We see that a database service is running on port 3306: MySQL
+
+Here, we have to install an interface to interact with the service.
+I have observed that for many of the practices, it could be the case that for a particular
+service, there is typically a tool to interface and interact with it.
+For this case, we install the tool: mysql
+
+Then we call mysql -h the virtual machine IP address -u root
+Typically, it is not possible to log in; one needs credentials. But this is just an exercise
+where we assume that the service is misconfigured and we can immediately connect to the service.
+
+Some commands then used:
+
+SHOW databases;
+shows all database
+
+use databaseName;
+will begin interacting with the database with name databaseName
+
+We can then do SHOW tables;
+to show all tables
+
+Then to query for all records: SELECT * FROM config;
+
+Here we can see the flag value: 7b4bec00d1a39e3dd4e021ec3d915da8
