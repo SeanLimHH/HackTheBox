@@ -1,0 +1,76 @@
+This exercises combines two previous ones, an insecure access configuration on FTP
+and an administrative login for a website.
+
+We begin with enumeration: nmap -sC -sV on target machine to gather info about it.
+-sC is used here; and in real scenarios, it is considered intrusive as some of the
+scripts in the default scripts are intrusive.
+
+
+We get results:
+
+ports 21 and 80 are open.
+21 is ftp, and Anonymous FTP login allowed.
+80 is http, and it is running Apache
+
+The significance of configuring the server to allow anonymous FTP login: no credentials
+are required.
+
+We then call ftp <virtual machine ip>
+
+then login with anonymous as our username. In this exercise, the username is "anonymous"
+
+Logging in, we check the directory with dir.
+We see two files: allowed.userlist and allowed.userlist.passwd
+
+We call get with the two files to download them.
+
+Here then, we have the credentials of some users.
+
+In this exercise, we can see why it combines both: the next step will require us to determine
+which account to use to login on service on port 80: these are the usernames:
+
+aron
+pwnmeow
+egotisticalsw
+admin
+
+and with respective passwords:
+
+root
+Supersecretpassword1
+@BaASD&9032123sADS
+rKXM59ESxesUFHAd
+
+Now we open the website with the IP address.
+
+Now, we want to figure out more information regarding a website.
+
+We can use a tool to analyse technology stack of websites: Wappalyzer
+
+The exercise suggests installing its chrome extension.
+
+Using the tool, we can see that the website is built by PHP. But not much more 
+useful information.
+
+Next, we use Gobuster to figure out all directories.
+This time, we want to also make use of a feature in Gobuster: filter out particular file
+extension types only; to bring down the number of results: This is done with -x then the file types:
+
+gobuster -u <virtual machine ip> -w ~/SecLists/Discovery/Web-Content/directory-list-2.3-small.txt -
+x php,html -t 150
+
+The -t extension is the number of concurrent threads.
+
+After running for a while, we get the following results:
+/index.html (Status: 200)
+/login.php (Status: 200)
+/assets (Status: 301)
+/css (Status: 301)
+/js (Status: 301)
+/logout.php (Status: 302)
+/config.php (Status: 200)
+
+We can see a login page: navigating to it: http://<ip address>/login.php
+
+Then using the credentials above, we enter the details into the login page.
+We can then see the flag: c7110277ac44d78b6a9fff2232434d16
