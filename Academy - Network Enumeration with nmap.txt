@@ -1,0 +1,157 @@
+More on -sS:
+
+On three-way handshake:
+
+We send out a packet with the SYN flag to server.
+This is one of the control flags in the TCP header.
+
+If the server is ok with establishing a connection, it will send back a TCP packet 
+with SYN and ACK flag set.
+
+The client will then send back an packet with ACK marked
+
+If the packet we receive has RST flag set, it means that the port is closed.
+So the idea is to send out to all ports and figure from the response whether it is opened or closed.
+
+If no packets are received from a port, nmap marks it as filtered. So it is ambiguous.
+
+
+On Host Discovery.
+We need to figure if our target is alive or not. This is done using an ICMP echo request.
+
+In this case, it might be useful to disable port scanning. This is done by -sn
+
+If you want a particular format to be stored: example tnet:
+you can do -oA tnet. This stores all formats with name starting with "tnet".
+
+If you are given a list of IP addresses, and you want to iteratively scan them:
+-iL <list_name>
+
+
+On disabling port scanning.
+
+nmap will automatically ping scan with ICMP Echo Requests.
+ICMP Echo Requests: A request type of check for latency and reachability. "ping" builds on ICMP Echo Requests.
+
+If pinging host is alive, we can expect an ICMP reply.
+
+To double-check, you can use --packet-trace.
+
+Different OS have different TTL:
+The default initial TTL value for Linux/Unix is 64, and TTL value for Windows is 128.
+
+
+
+Hosts and Port Scanning
+If we run as sudo, root, nmap sends packets with SYN flag by default
+Otherwise, nmap sends TCP packets by default.
+
+Difference: SYN flag set: does not complete three-way handshake; TCP connect scan completes.
+As a result, SYN flag set enables stealthier scanning.
+
+Default is top 1000 TCP ports.
+-p enables specific ports to be scanned.
+-F is top 100 ports
+the argument --top-ports = 10 is another method to specify how many ports to scan.
+
+-n disables DNS resolution. This means nmap does not need to resolve IP addresses to hostnames. Leads to faster scans.
+
+To figure out hostname you would use DNS.
+
+ARP ping scans: sends out ARP requests for each IP address in the local network.
+Idea is to enable mapping of IP addresses to MAC addresses in the network.
+
+ARP ping scans are less likely to be detected by Firewalls because they occur in Layer 2: the layer below the Firewall. Hence bypasses the measures put out by firewalls.
+It is also hard to figure a malicious ARP request; there is no targeted IP address.
+
+-Pn disables ICMP echo requests. This is usually done when you perform a SYN scan.
+-sS is SYN scan. 
+
+SYN scans: determine if a port is open, closed or filtered. Operates on Transport Layer (Layer 4)
+
+ICMP echo requests (Pings): Operates on Network Layer (Layer 3). Idea is to check if a host is up and latency (how long it responds).
+
+
+
+
+TCP Connect Scan: -sT
+This attempts to establish a three-way handshake with a port.
+So this builds on top of SYN scans: it completes the handshake.
+
+This is also the most accurate way to tell if a port is open.
+
+Interestingly, although it attempts to complete the handshake, it makes this less suspicious and less likely to be picked up by Intrusion Prevention Systems (IPS) or IDS.
+
+
+Filtered Ports
+In most cases, this is due to firewall policies.
+
+Packets are either dropped or rejected.
+
+Dropped: no response
+
+Rejected: ICMP Destination Unreachable message. Type 3 error code 3
+
+
+UDP ports
+These ports are different from TCP ports in the sense that they have no protocols and are stateless.
+-sU
+It is typically slower because there is no acknowledgement.
+
+
+nmap -A is aggressive scan: it will gather more information at expense of discovery.
+
+
+
+Saving results
+When scanning, it is good practice to save the results.
+nmap has 3 different formats:
+
+Normal output (-oN) with the .nmap file extension
+Grepable output (-oG) with the .gnmap file extension
+XML output (-oX) with the .xml file extension
+
+-oA will save in all three formats.
+
+There is a tool that can help us churn out a nicely-formatted report: xsltproc: it builds from xml to a html format.
+
+
+
+Recommendation: scan small first > run port scan in the background for all open ports(-p-) > then run version scan on desired specific ports for more service information.
+
+Pressing space bar shows the progress of the scan
+
+--stats-every=5s recurs the stats every 5 seconds; -v makes the output more descriptive.
+
+
+
+
+Banner Grabbing
+This refers to gathering information regarding services and their versions and other metadata.
+
+
+How nmap figures services: It first looks at the banners of the scanned ports and prints them out.
+If it cannot figure its version, it will scan through for known signatures.
+
+After a successful three-way handshake, servers will typically send a banner for identification. Some services though, will not send a banner for identification.
+
+
+tcpdump
+Used to capture and analyse data packets in real-time.
+Usage: sudo tcpdump -i eth0 host <between ip address 1> and <ip address 2>
+-i is the network interface; Ethernet in this case.
+
+nc
+Used to create UDP or TCP connections.
+Usage: nc -nv <ip address> <port>
+Initiates a TCP connection with IP address on port 25.
+-n: Disable DNS resolution; useful if you want IP address, not hostname.
+-v: verbose mode
+
+These two tools can be combined to intercept network traffic:
+Firstly, run tcpdump.
+Then establish a connection with server using nc.
+During this establishment of connection, you can see data packets coming to your nc server via tcpdump
+
+You can use scripts with nmap: Nmap Scripting Engine (NSE)
+To use a script: --script <script category> 

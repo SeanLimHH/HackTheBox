@@ -85,10 +85,9 @@ The following are the details:
     |_    5.15.15
 
 
-There is a vulnerability with the above's software:
-On Oct 27th, open-source web server software provider Apache disclosed a new 
-vulnerability with a CVSS score of 10, which is currently being tracked as 
-CVE-2023-46604.
-
+There is a vulnerability with the above's software: service on port 61616
+https://xmcyber.com/blog/cve-2023-46604-remote-code-execution-rce-flaw-in-apache-activemq/#:~:text=On%20Oct%2027th%2C%20open-source,to%20run%20arbitrary%20shell%20commands.
 This is a remote code execution (RCE) flaw in Apache ActiveMQ's OpenWire Module,
 which can allow attackers to run arbitrary shell commands.
+
+--- stop --- 
