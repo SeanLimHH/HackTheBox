@@ -155,3 +155,60 @@ During this establishment of connection, you can see data packets coming to your
 
 You can use scripts with nmap: Nmap Scripting Engine (NSE)
 To use a script: --script <script category> 
+
+Firewalls
+Monitors network traffic between the firewall and incoming data connections
+Prevents dangerous connections but also analyses potential attacks and reports them
+
+If specific patterns are detected, the IPS will prevent the incoming connections
+Firewalls have certain rules to handle packets - drop or reject
+
+Dropped packets - as an attacker there is no response.
+
+For rejected packets with RST flag, they will typically have a ICMP error code or have nothing at all.
+
+TCP packets with just ACK flags are stealthier. Reason being is that a Firewall cannot tell
+if it is within the network or outside the network.
+
+When a port is closed: host will respond with an RST flag.
+
+All connections attempts from outside the network are usually blocked by Firewalls
+
+
+
+IDS systems
+
+Used to detect potential attacks. Will alert administrator if detection occurs.
+
+A way to bypass this measure is to use VPS. Virtual Private Servers (VPS).
+Rationale: administrators will try and ban IP addresses. If you use a VPS, you have
+other possible servers to try penetration testing on the machine.
+
+
+Spoofing a packet
+It is possible to edit the headers of the packet to fake an IP address.
+For this, we can use nmap -D for decoy. nmap will generate various random IP addresses
+inserted into the IP header to disguise the origin of the packet sent.
+Usage:
+-D RND:5
+means to generate 5 random number of IP addresses. Our real IP address will then be in
+one of them.
+All decoys, in this process, also must be online so that we will not trigger security mechanisms
+that detect flooding.
+
+
+Spoofed packets are often filtered out by ISPs and routers, even if they come from the same
+network range.
+
+
+Reverse DNS resolution:
+Reverse DNS lookup. This is just the reverse of the DNS resolution process
+
+DNS proxying is the interception between DNS queries from client to server.
+DNS queries are typically sent over UDP port 53. Sometimes TCP too nowadays.
+You can input your own custom DNS servers using --dns-server.
+
+DNS servers within a company are typically more trusted than outside.
+Hence it is better to use them to interact with the hosts of the internal network
+
+You can use nmap to scan on TCP port 53 as a source port.
