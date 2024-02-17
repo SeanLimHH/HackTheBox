@@ -212,3 +212,25 @@ DNS servers within a company are typically more trusted than outside.
 Hence it is better to use them to interact with the hosts of the internal network
 
 You can use nmap to scan on TCP port 53 as a source port.
+
+Against firewalls, to perform a TCP ACK scan (harder to bypass) due to presence of
+only the ACK flag set, do nmap -sA
+
+Figuring out DNS server version. We can use script dns-nsid:
+sudo nmap -sSUV -p 53 --script dns-nsid <ip>
+
+The nmap script does the following: Retrieves information from a DNS name server by
+requesting its nameserver ID (nsid) and asking for its id.server and version.bind values.
+
+nameserver ID of DNS name servers: optional. Allows DNS servers to be uniquely identified.
+Note that nsid is assigned by the server; it is theoretically possible for two servers in
+the world to have the same id.
+
+version.bind
+This is the version number about the DNS server running.
+It is called .bind appended because it refers to the BIND software, a widely used DNS server
+software:
+https://www.isc.org/bind/.
+The important takeaway is that bind has become a convention by the DNS community.
+So although there are other DNS softwares, we generally still use version.bind to query its
+DNS software version simply due to convention.
