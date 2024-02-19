@@ -234,3 +234,32 @@ https://www.isc.org/bind/.
 The important takeaway is that bind has become a convention by the DNS community.
 So although there are other DNS softwares, we generally still use version.bind to query its
 DNS software version simply due to convention.
+
+For the hard lab.
+
+We first run the command to scan for available ports.
+
+This time, the main issue was the time. It took too long to scan the machine, especially with all ports.
+
+By disabling the arp ping, the scans were completing much faster. Similarly -Pn also skips waiting for the host to respond; hence speeding up the scanning process as well.
+
+sudo nmap -sV -Pn --disable-arp-ping --source-port 53 <ip address> -p-
+
+However, it was still taking practically too long. Online, it was suggested to perform an aggressive search just for this lab to speed up the process:
+
+sudo nmap -sV -T5 -Pn --disable-arp-ping --source-port 53 <ip address> -p-
+
+We get the following:
+
+Not shown: 63332 closed tcp ports (reset), 2200 filtered tcp ports (no-response)
+PORT      STATE SERVICE    VERSION
+22/tcp    open  ssh        OpenSSH 7.6p1 Ubuntu 4ubuntu0.7 (Ubuntu Linux; protocol 2.0)
+80/tcp    open  http       Apache httpd 2.4.29 ((Ubuntu))
+50000/tcp open  tcpwrapped
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Then the last part is to connect using netcat as per in the tutorial: to the target port as well. The source port used in this case is 53 as DNS queries are made over port 53 - tcp and slowly more udp
+
+sudo ncat -nv -p 53 <ip address> 50000
+
+This performs a TCP connection to the IP address at port 50000 from source port 53. Without the source port 53 specification, the machine actively refused to connect.
