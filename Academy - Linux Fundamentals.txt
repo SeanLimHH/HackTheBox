@@ -1,0 +1,154 @@
+prefix man for manual. --h or -help is a short form for it.
+
+Each manual has a short description available within it.
+The command "apropos <keyword>" returns a succinct summary of the command.
+
+System information
+The following are useful system commands:
+whoami => displays current username
+uname => displays basic information about OS and system
+ifconfig => assign or view addresses to a network interface and or configure its parameters
+ip => utility to show routing, network devices, interfaces and tunnels. Also used for changing its settings.
+netstat => shows network settings
+ps => shows process status
+who => displays who is logged in
+env => displays environment (variables)
+lsblk => displays blocked devices
+lsusb => displays USB devices
+lsof => displays open files
+lspci => displays PCI devices
+hostname => prints the name of the computer we are logged in to.
+Differs from whoami which shows the username; not the name of the computer.
+
+id
+This command builds on top of the whoami command and prints out the effective group membership and IDs. Useful to probe for more information regarding groups and identities in them.
+There are some existing built-in groups:
+adm: admin group: can read logs in var/logs
+sudo: all-powerful root user: can run anything. Can be used for escalating privileges
+for other users.
+
+uname can be used to detect system information regarding the machine; then from there one can scan for vulnerabilities on the machine.
+
+
+Logging in via SSH:
+SSH is a protocol that allows clients to access and execute commands on a remote computer.
+Typically used for Linux-based hosts and or Unix-like OS.
+SSH login: ssh [username]@[IP address]
+
+mail spool:
+a location where the computer temporarily stores incoming and outgoing email messages before processed by the mail application
+In Linux, this location is typically: /var/spool/main/$USER
+
+/var directory contains files that are expected to change in size or content as the system operates.
+
+The env command in Linux can provide a lot of information - environment variables and values set on the computer.
+
+MTU: Maximum Transmission Unit. Largest size of a data packet that can be transmitted over a network connection. Size of payload portion.
+The downsides of having larger packets: Higher chance of packet fragmentation which will have more overhead.
+
+Navigation
+ls vs dir: dir is used in Windows command prompt; ls is used in Unix-like systems
+ls -l provides more information : long format
+ls -a lists all files of a directory. + hidden files
+ls -i lists in the inode numbers of each file or directory
+
+inode is a data structure used by UNIX-like systems to store metadata regarding a file or directory in a system.
+It contains information about a file; and also within it a pointer to its actual address (data blocks) on the physical disk where the file contents are stored.
+
+After cd, you can call cd - to return back to previous directory
+
+Shortcut: you can call like cd D
+Then the D represents some directory. From here, you can press tab to auto-complete if there is only one directory that starts with D; else twice to display all directories starting with that letter.
+
+rmdir to remove directories; rm to remove files
+
+One dot (.) represents current directory; two dots (..) represents parent directory
+clear clears the terminal
+
+
+
+File and directory manipulation
+mkdir makes a directory; touch creates a file
+mkdir -p /directory/path
+-p with mkdir allows you to create a directory at a given path.
+
+tree .
+This will print out a nicely-formatted tree-like structure of your directory.
+Root is your current directory.
+
+mv <from> <to>
+This command is not just for moving files; it can be used for renaming as well.
+
+cp <from> <to>
+This command copy-pastes the directory from and to the designated path.
+
+
+ls -lt will also sort based on time (-t parameter)
+
+
+
+
+
+Editing files
+We use a text editor.
+Nano editor is used in this example:
+nano notes.txt creates a new file called notes.txt
+
+In the editor:
+The caret (^) stands for our "[CTRL]" key.
+
+The exit functionality will save the file
+
+To view contents of a file: cat <file>
+
+Vim
+Open-source text editor.
+Has 5 modes:
+1. Normal
+    a. All inputs are treated as editor commands. We start here
+2. Insert
+    b. All inputs are inserted.
+3. Visual
+    c. Mark parts of text. These marked texts then can be manipulated - replaced; deleted; copied...
+4. Command
+    d. All inputs are treated as single-line commands at bottom of editor. Commands are like sorting; replacing sections; deleting them...
+5. Replace
+    e. All inputs will replace existing once. If no existing character at position to replace, then it creates the new input.
+
+vimtutor is an excellent way to start using Vim.
+
+
+
+Finding files and directories:
+which <executable program>: this returns the file path of executable program.
+find <directory>: lists all files in that directory. Can chain with grep to quickly locate a file.
+
+find has configurations which can make the search faster: examples:
+-type f searches for objects that are "files"
+-user root: filters for option whose owner is root.
+-size +20k: filter for files with sizes > 20k
+
+The idea of caching your searches: locate command.
+locate
+This will work with a local database that stores all information about existing files and folders.
+We can update this local database with "sudo updatedb".
+After updating, you can notice a significant speed increase in the locating of a file
+locate *.txt
+
+
+find -newermnt: newer than modification time.
+So you input -newermnt YYYY-MM-DD to find files newer than that date.
+
+find -type f -name "*.conf"
+This uses a wildcard - finds files that ends with .conf
+
+2>/dev/null
+Calling it will redirect all error messages to a special device file that discards all
+data written to it.
+Use this to silence error messages or unwanted outputs
+
+
+wc -l
+Very useful tool. wc stands for word count. Can be used to count number of files
+(number of lines) in the output.
+-l stands for line.
