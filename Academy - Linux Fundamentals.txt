@@ -152,3 +152,136 @@ wc -l
 Very useful tool. wc stands for word count. Can be used to count number of files
 (number of lines) in the output.
 -l stands for line.
+
+
+
+
+File descriptors in Linux
+
+Think of them as handles to files.
+
+Unix/Linux: In Unix/Linux, file descriptors are connections managed by the kernel to 
+facilitate Input/Output operations with files, devices, and other resources.
+
+Windows: In Windows-based systems, the equivalent concept is known as a file handle,
+serving a similar purpose of managing connections for I/O operations.
+
+There are default file descriptors: numbers 0, 1, 2 representing stdin, stdout and stderr
+
+When you see : interpret
+
+stdin: program is reading user input; waiting for input
+Typically associated with keyboard strokes.
+Note that stdin can be redirected: this means you can re-expect input not from the keyboard
+but somewhere else. Example is from another file. Done with redirection operator (>)
+UNIX will represent this as file descriptor number 0
+
+stdout: this is the default output stream where programs write their output to.
+Typically, stdout is associated with the terminal or console.
+Also can be redirected like stdin
+UNIX will represent this as file descriptor number 1
+
+stderr: typically where the program's error messages and code will be output from.
+
+Also can be redirected like stdin
+UNIX will represent this as file descriptor number 2
+
+Think of stdin, stdout and stderr as water pipes.
+
+A typical use case of silencing errors.
+As per above: redirect stderr to /dev/null to silence error messages.
+This is useful in some scenarios: if you want to ignore error and proceed; clean up
+output; prevent code interruption...
+
+Redirection is >; and we can interpret the direction of it to see from and to the
+redirections are directed at.
+
+Double arrows >> implies appending to a file.
+
+You can chain double arrows with End Of File (EOF) function to define an input's end.
+
+Another form of redirection is piping (|).
+Typically used with grep; where we use regular expressions to pattern-match and extract
+desired found data.
+
+
+
+
+Filtering of contents
+
+more
+This tool helps display contents of a file in page sections.
+So you can press some other key to go to the next page.
+
+less
+Similar to more. Will display the content of a file nicely.
+
+head
+This shows you the first 10 lines of file
+
+tail
+Similarly, this shows you the last 10 lines of file
+
+sort
+We can use this after piping.
+| sort
+This will sort the input in alphabetical or numerical order
+
+grep
+Uses pattern to pattern match and extract out found text.
+-v will exclude the results.
+
+To remove delimiters, we can use cut
+
+cut
+This is useful to strip out delimiters:
+cut -d":" -f1
+The -d stands for delimiter. In this case, we are setting it to ":'
+Then, -f1 will display the first index after splitting.
+So if you have the form:
+a:b:c:d:e
+and you run cut -d":" -f4, you will display "d" only.
+The number is the index to show in that delimiter-split line.
+
+tr
+Replaces certain characters from a line with.
+Stands for translate.
+Usage is: tr "toReplace" "replaced"
+Used after piping.
+
+column -t
+This is used to display in column-form.
+-t is tabular form
+Used after piping
+
+
+
+awk
+A text processing tool. Programming language as well.
+It does field-based processing.
+So a typical command would be like:
+awk '{print $1, $NF}'
+Fields are referenced by $1, $2, $3, etc.,representing
+the first, second, third, and so on fields in a line.
+
+The special variable $NF refers to the last field in the line.
+
+
+
+sed
+Stands for stream editor
+Can be used for substituting patterns and other commands:
+sed looks for patterns we have defined in the form of regular
+expressions (regex) and replaces them with another pattern that
+we have also defined.
+| sed 's/bin/HTB/g'
+s flag at the start stands for substitute command.
+Then after the first / is the pattern (bin)
+Then after the second / is the replacement text (HTB)
+g flag at the end stands for global. Signals to replace all matches.
+
+
+
+wc
+Word count. -l specifies that only lines are counted.
+We can pipe then wc.
