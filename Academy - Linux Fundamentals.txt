@@ -284,4 +284,10 @@ g flag at the end stands for global. Signals to replace all matches.
 
 wc
 Word count. -l specifies that only lines are counted.
-We can pipe then wc.
+
+To see packages are installed in Linux system:
+apt list --installed.
+
+grep -c "pattern" counts and returns how many times the pattern occurred. 
+
+sort -u returns all unique lines; removes duplicates
