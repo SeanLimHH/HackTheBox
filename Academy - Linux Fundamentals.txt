@@ -291,3 +291,159 @@ apt list --installed.
 grep -c "pattern" counts and returns how many times the pattern occurred. 
 
 sort -u returns all unique lines; removes duplicates
+
+
+
+
+Regular expressions
+
+Round brackets: logical grouping
+Square brackets: define character list to search for
+Curly brackets: specifies range of how many times a pattern should be repeated
+
+If you want to extend grep and use operators like OR or AND, you must specify with
+parameter -E
+then grep -E "(characterCheck|anotherCharacterCheck)" /etc/passwd
+
+for AND operator: substitute | for .*
+For AND operator, the order must be enforced. If the operands are not in the correct
+order, there will be no return
+
+
+
+
+
+Permission management
+Linux assigns permissions to users and groups.
+
+Users can be part of a group. If so, they will be given specific permissions.
+"Permission Denied" error means the user has no right to access the file.
+
+
+execute permission
+This permission allows for traversal of directories.
+It does not, contrary to its name, allow a user to execute or modify any files
+or content within a directory.
+
+
+To change permission (of a file or directory)
+You will need write access to the file or directory.
+In Linux, there are 3 types of permissions of a file or directory:
+(r) - Read
+(w) - Write
+(x) - Execute
+The syntax of what is being displayed and permissions:
+
+- rwx rw- r--   1 root root 1641 May  4 23:42 /etc/passwd
+- --- --- ---   |  |    |    |   |__________|
+|  |   |   |    |  |    |    |        |_ Date
+|  |   |   |    |  |    |    |__________ File Size
+|  |   |   |    |  |    |_______________ Group
+|  |   |   |    |  |____________________ User
+|  |   |   |    |_______________________ Number of hard links
+|  |   |   |_ Permission of others (read)
+|  |   |_____ Permissions of the group (read, write)
+|  |_________ Permissions of the owner (read, write, execute)
+|____________ File type (- = File, d = Directory, l = Link, ... )
+
+We use:
+chmod <permission group reference><+ or - to add or remove permission><read, write and or execute> <file name>
+There are a few permission groups: u - owner, g - Group, o - others, a - All users.
+
+Example:
+chmod o+x shell
+This sets the access rights of those in group "others" the execute (x) permission on the executable "shell"
+
+A little background on how the permissions are represented in binary:
+3 permissions so 000 to 111
+Going by position, Linux has r w x representing the positions in the binary string 111.
+If the file lacks for example write permission, Linux will substitute the middle 1 with 0.
+So we get 101. Then, for each 0, Linux substitutes it with a "-". So we will get r - x
+
+
+
+To change owner of a file:
+chown <new user>:<new group> <file/directory to change>
+
+
+
+Consider the case of having to change each file's permissions to suit a user.
+A simpler approach is to change the rights of the user. This can be done by setting the bits
+of SUID and SGID.
+
+SUID and SGID
+Set User ID and Set Group ID. This enables users to run programs with the rights of another
+user or group.
+
+
+
+Sticky bits
+These are special bits: makes the directory only deletable or renameable by the root or owner.
+Useful for shared files.
+Represented by letter "t" in directories.
+Generally used for directories only.
+T in the following means that the directory has no execute permission for "others": see the second.
+
+drw-rw-r-t 3 cry0l1t3 cry0l1t3   4096 Jan 12 12:30 scripts
+drw-rw-r-T 3 cry0l1t3 cry0l1t3   4096 Jan 12 12:32 reports
+
+Observe that the "x" position is replaced with t.
+
+
+
+User management
+
+su
+Switch user.
+Change the effective user ID and group ID to that of <user>: su <user>
+
+
+useradd: adds a new user or updates default new user information
+sudo useradd newUsername
+
+userdel: deletes an existing user
+sudo userdel newUsername
+
+usermod: modifies an existing user account
+sudo usermod -G groupName newUsername
+The above will update the user "newUsername" to be in a group called "groupName"
+
+addgroup: adds a new group
+sudo addgroup groupname
+This creates a new group called "groupname". The name has to be in all lowercase
+or as per defined by the regex NAME_REGEX[_SYSTEM] configuration variable.
+
+delgroup: deletes an existing group
+sudo delgroup groupname
+
+passwd: changes user's password
+sudo passwd newUser
+This changes the password for the user "newUser"
+
+
+
+Package Management
+There are many different types of package management software. Each covers different types of files:
+".deb", ".rpm", ...
+These are typically created and maintained under Linux distributions.
+If the package requires other libraries; it will prompt the user and then install them.
+It just manages adding new packages; deleting them and updating of them in a controlled manner.
+
+Popular one is dpkg. dpkg is a tool to install build remove and manage Debian packages.
+A front-end for dpkg is aptitude: alternative to apt.
+
+apt and aptitude: high-level command-line interface for package management system
+
+snap enables installing, configuring, refreshing and deleting snap packages. snap packages are secured
+distributions of the packages.
+
+gem is another front-end for RubyGems. RubyGems, like dpkg, is a package manager tool, but for Ruby.
+
+pip is another front-end for Python. Meant for Python packages.
+
+git is a distributed revision control system.
+
+
+Debian-based Linux systems use the APT package manager.
+A package will contain multiple ".deb" files: we use dpkg to install these .deb files.
+Benefit of APT in this case: if it detects required dependencies, it will install them.
