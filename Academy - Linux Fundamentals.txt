@@ -447,3 +447,140 @@ git is a distributed revision control system.
 Debian-based Linux systems use the APT package manager.
 A package will contain multiple ".deb" files: we use dpkg to install these .deb files.
 Benefit of APT in this case: if it detects required dependencies, it will install them.
+
+When we update or install a new package, the system will query the software repositories in its 
+respective Linux distribution.
+
+APT uses a database called APT cache.
+These contains information about the packages offline:
+apt-cache search <package>
+
+To search for more information:
+apt-cache show <package>
+
+
+
+To show all installed packages
+apt list --installed
+
+
+
+
+Service and Process Management
+In general, there are two kinds of services: internal, which are relevant services required
+on system startup, and user services - installed by the user.
+Server services run in the background without user interaction.
+
+These are called daemons and are typically represented by a postfix "d" after the program name:
+sshd or systemd
+
+systemd exists in most Linux distributions, and is responsible for orderly starting and stopping
+of other processes.
+
+systemd's logging service is journalctl.
+journalctl prints the log from journald, a service for systemd
+
+All processes have an id: can be viewed under /proc/ with the corresponding number.
+
+We can use systemctl to list all services
+
+To list processes: ps
+ps -aux
+Lists processes
+-aux:
+a = show processes for all users
+u = display the process's user/owner
+x = also show processes not attached to a terminal
+
+A process can be in any of the following states:
+Running
+Waiting (waiting for an event or system resource)
+Stopped
+Zombie (stopped but still has an entry in the process table).
+
+We can stop or kill a process: kill, pkill, pgrep and killall.
+The idea is to send a signal to stop the process. kill -l will list all signals
+The signals each are denoted by a number; the number represents a signal.
+We call kill 9 <process id > to send signal 9 to the process
+
+All background jobs can be displayed with "jobs"
+
+To send a process to the background:
+run the command => press CTRL Z to suspend the process => "bg" to send to background
+Alternative => Set an "&" at the end of the command.
+
+When the job is done, it will appear on console.
+
+Similarly, if you want to bring back a job in the background to the foreground, run "fg"
+
+
+Execution of multiple commands:
+There are 3 approaches: each having different consequences: ; && |
+
+;
+Separates commands and ignores previous commands' errors and results
+
+&&
+Runs commands one after the other. Terminates on error.
+
+|
+Uses the previous result and pipe it into another command.
+
+
+
+Task Scheduling in Linux
+We can use systemd to:
+1. Create a timer
+2. Create a service
+3. Activate the timer
+
+We can also use Cron. This is a tool to schedule and automate processes.
+To do so: we create a script for the Cron daemon to call it at a specific time
+To set up: we store the tasks in a file called a crontab. Then tell the daemon when to run the tasks
+
+
+
+Network Services
+
+SSH
+Secure Shell Protocol. Widely used to transmit data.
+In order to even connect to a Linux host with SSH; its server must be running. A popular open-source
+SSH server is OpenSSH server.
+
+SSH is a way to establish secure remote connections without being intercepted by third parties.
+
+We can check our SSH status: systemctl status ssh
+
+Some use case: login to another machine perform commands and or file transfer without eavesdropping
+
+Network File System (NFS)
+This is a protocol that enables us to store and manage files remotely as if it were local.
+Just a way to file transfer over the web
+
+We can check NFS status: systemctl status nfs-kernel-server
+
+All details and settings are in /etc/exports. Transfer speed, encryption, access rights...
+
+
+
+Web Servers
+Uses HTTP to transfer data.
+We use a web server to interact with a machine through an incoming HTTP or HTTPS port
+
+You can host your own web server: Apache Web Server
+To change settings (global settings): /etc/apache2/apache2.conf
+
+Another approach is using Python: python3 -m http.server
+This starts the web server on TCP port 8000. The directory where you ran the command: you 
+will be able to view the files in it.
+
+
+VPN
+Allows us to securely connect to a network as if we were directly in it.
+Done via an encrypted tunnel between client and server.
+
+Mainly used by companies to provide employees with secure access to the internal network
+without being physically present.
+Popular ones are like OpenVPN.
+
+Similarly, you can change its settings: /etc/openvpn/server.conf  
