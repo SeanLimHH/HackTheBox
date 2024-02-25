@@ -584,3 +584,170 @@ without being physically present.
 Popular ones are like OpenVPN.
 
 Similarly, you can change its settings: /etc/openvpn/server.conf  
+
+
+Working with web services
+Apache has many other tools. Some of it enables you use appropriate modules to encrypt communication
+between the browser and web server, or use the server as a proxy server, or perform manipulation of
+HTTP header data and URLs.
+
+
+cURL is a tool that allows us to file transfer from the shell through protocols like HTTP, HTTPS, FTP,
+SFTP, FTPS or SCP.
+Can be used for testing and controlling websites remotely as well.
+
+curl <website> returns html
+
+Alternative to cURL: wget. wget enables downloading of files from FTP or HTTP servers directly from the
+terminal.
+
+
+
+Backup and restore
+Linux system offer ways to backup and restore data
+Tools: Rsync, Deja Dup, Duplicity
+
+Rsync
+
+Backup local to remote server:
+rsync -av /path/to/mydirectory user@backup_server:/path/to/backup/directory
+
+-a: archive (preserve file attributes); -v: verbose
+
+Restoring backup:
+rsync -av user@remote_host:/path/to/backup/directory /path/to/mydirectory
+This is just the reverse of the backup command.
+
+We can also make the file transfer encrypted + use SSH:
+rsync -avz -e ssh /path/to/mydirectory user@backup_server:/path/to/backup/directory
+-e: encrypted
+
+To make the backup consistent: use cron to schedule the backups; run the command:
+
+First we create the script:
+
+#!/bin/bash
+
+rsync -avz -e ssh /path/to/mydirectory user@backup_server:/path/to/backup/directory
+
+Then make sure that the file is executable and only you can access
+
+Adding a crontab: example
+0 * * * * /path/to/RSYNC_Backup.sh
+
+
+File system management
+
+Linux supports different file systems: ext2, ext3, ext4, XFS, Brtfs, NTFS
+More on file systems:
+Each file system has its pros and cons.
+
+NTFS is used by Windows
+
+Best choice depends on the user.
+
+Different OS supports different file systems.
+Different Linux distributions support different file systems too.
+
+The Linux file system is based on the Unix file system.
+It has a hierarchical structure, top is the inode table.
+
+
+
+Inode table
+This is an table of information associated with each file and directory on a Linux system.
+It contains metadata about the file or directory, such as its permissions, size...
+Just think of it as a database of file / folder information.
+An inode table is referenced when a file operations are performed: create, read, update, delete.
+An inode table stores data in an efficient data structure. It differs based on file systems;
+Different Linux distributions may have slight variations on the data structure
+
+
+Files in Linux are stored in two ways: file or directory.
+Linux also supports symbolic links
+
+
+
+Symbolic links
+These are quickly used to access files that are located at a different part of the file system
+
+
+
+Each file and directory needs to be managed in terms of permissions.
+
+
+Disk management in Linux
+Tool is fdisk, enabling CRUD operations on a drive.
+It can also be used to display a partition table and able to manage it; view its size and type.
+One can partition a drive in Linux; enabling one physical storage space to be split up; each with
+its own specific file system.
+
+Common partitioning tools are fdisk, gpart and GParted.
+
+
+What is mounting?
+This is a process.
+This is when you assign a drive or partition to a particular directory in Linux.
+You need to do this to even be able to access the drive.
+When you mount a drive, you integrate it into the file system.
+
+We use the "mount" tool to mount file systems on Linux
+/etc/fstab file is used to define the default file systems that are mounted at boot time.
+
+"mount" command will display all mounted file systems.
+It shows the device name, file system type, mount point, and options.
+
+sudo mount <from_directory> <to_directory>
+Some example use case: mounting a USB to a folder on Linux:
+You will be able to access the USB's files and directories in that folder you mounted onto in Linux
+
+To unmount: sudo umount <the_to_directory_of_when_you_mount>
+Like windows, if there are running processes that is using the directory, you cannot unmount the device.
+
+
+
+
+
+Swap space in Linux
+This is relevant when available physical memory (RAM) is depleted.
+
+At this point, the kernel transfers inactive pages of memory to the swap space. This frees up space in the RAM
+The kernel cannot delete the data in the pages as it may be of use in the future.
+
+The swap space will now have more memory to be used by running processes.
+
+You can create the swap space, determine its size.
+
+The command mkswap makes a swap space in a file.
+This is done by initialising a designated file or partition to be used as swap space
+and creates this header. The header includes information that identifies the file or partition as a swap
+space area.
+
+This identification ensures that the kernel recognizes the designated space as available for swapping out
+memory pages when necessary.
+
+, and command swapon activates the swap area.
+
+The size of the swap space is up to you.
+
+When creating a swap space, it is important to ensure that it is placed on a dedicated partition or file,
+separate from the rest of the file system.
+This helps to prevent fragmentation of the swap space (data becomes scattered everywhere
+instead of being in a contiguous block).
+This also helps ensure that the system has adequate swap space available when it is needed.
+
+It is also important to ensure that the swap space is encrypted, as sensitive data may be stored in the
+swap space temporarily.
+
+Excessive swap space might not be good. Disk access is slower than RAM, so you might not want to swap
+unless necessary
+
+If there is still not enough space after the swap: the system will experience performance issues. This is
+where your system may freeze or crash
+
+It does have some tools: Linux Out of Memory Killer (OOM Killer)
+This tool will review all running processes: kill one or more of them to free up space.
+How does it determine which process to kill: based on its own scoring system: oom_score
+To view all oom scores of all processes: cat /proc/*/oom_score. Higher means more likely to be killed
+
+Swap space is also used for hibernation; sleep state
