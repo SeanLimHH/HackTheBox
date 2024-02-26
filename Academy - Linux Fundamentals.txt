@@ -751,3 +751,150 @@ How does it determine which process to kill: based on its own scoring system: oo
 To view all oom scores of all processes: cat /proc/*/oom_score. Higher means more likely to be killed
 
 Swap space is also used for hibernation; sleep state
+
+
+
+
+Containerisation
+
+This is a process of packaging and running applications in an isolated environment.
+The environment is called a container, virtual machine or serverless environment.
+These running applications are self-sufficient; they have all the libraries, code, system tools, settings
+to run separately.
+
+An example is a web application where you put the frontend, backend and database code
+and applications in separate, independent and isolated "places".
+Then, there are many benefits here. You can scale which component is more taxed; identify which containers
+need more resources; figure out which container is responsible for a point of failure.
+You can also then, because all the components are separate, have many other new applications that uses just
+the contained database but not the frontend or the backend.
+Security is another major benefit; there is no longer a single point of failure with containers.
+
+These make containerisation very useful for long-term and large-scale projects.
+
+Docker is an open-source platform for automating the deployment of applications.
+
+Necessary parts to run a container:
+1. Docker engine
+2. Docker image: Dockerfile
+Docker Hub provides both parts
+
+As i think Docker is a topic that can be explored on its own, i will be writing my learning points in a
+dedicated separate file.
+
+Linux has its virtualisation technology that enables multiple isolated Linux systems to run on a single host.
+This is called "Linux Containers"
+
+There are some differences from Linux's virtualisation technology from Docker.
+It has fewer features than Docker, the containers are tied to the host system and can be harder to manage.
+
+Docker builds on top of LXC, and hence is more user-friendly.
+
+A Dockerfile contains the base image and instructions to build the image.
+These images are meant to be portable so that they can be moved around.
+
+
+
+Network configuration
+Management of network settings; network interfaces.
+
+
+Network Access Control (NAC) is useful to know for network security
+There are many NAC technologies available. Each NAC is a model: a model where
+depending on what kind of security measures you want to implement, you would
+choose the type of Access Control.
+
+1. Discretionary Access Control (DAC)
+    Principles: 
+        1. Each object has properties; only visible and modifiable by authorised users.
+        2. Each failed attempt enforce additional multi-factor authentication. Or denies access.
+        3. User can "transfer ownership" of an object or group of objects to another person.
+            The user can also control what kind of ownership rights he wants to give the person.
+    Pros:
+        1. Flexible (each user can control very specifically what kind of rights an object can hold)
+        2. User-friendly (fast and easy to change and act on)
+    Cons:
+        1. Not actually safe because any user can share anything that they have control over; no system
+        2. No system or structure to monitor a user's activity. No centralised access management
+
+2. Mandatory Access Control (MAC) : considered most secure
+    Principles: 
+        1. Centralised - only the administrator determines who has the rights to view or edit files.
+        2. Each object has a confidentiality level
+        3. Each user has a clearance level
+        4. Using 2, 3, which are provided by 1., the OS either allows or rejects the desire to view or
+        edit the file
+    Pros:
+        1. Secure and fewer errors. Because now only the administrator (one person) determines who gets
+        the rights to the file; not just any user.
+        2. User-friendly (fast and easy to change and act on)
+    Cons:
+        1. Not flexible (employees must ask administrator to vet their clearance for a file everytime)
+        2. Because of 1., it is not scalable automatically. Each new object or person needs to be vetted 
+3. Role-based Access Control (RBAC)
+    Principles: 
+        1. Permissions are given to users based on their roles
+        2. Users are grouped into roles, and permissions are assigned to roles.
+    Pros: 
+        1. Structurally simple: if you have role X, you get permissions X to do the role.
+        2. Because of 1., it is easier to maintain and still preserves security
+    Cons: 
+        1. Can be complex if there are many roles and permissions. Since each needs careful analysis
+
+Linux enables one to configure NAC to adopt one of these models.
+
+
+Configuration of Network Interfaces
+
+ifconfig
+This enables viewing and editing of system's network interfaces.
+Note that it is slowly being replaced with "ip"
+
+Network interface configurations typically use either ifconfig or ip.
+
+You can activate a network interface: sudo ifconfig eth0 up
+You can allocate IP to a network interface: sudo ifconfig eth0 <ip address>
+Similarly, you can also change the netmask for an interface: sudo ifconfig eth0 netmask 255.255.255.0
+
+
+Default Gateway
+A default gateway is the ip address of the router.
+You can change the IP address of it using the "route" command and "add" option:
+
+sudo route add default gw 192.168.1.1 eth0
+
+
+When we change IP addresses of any network interface, it is important to reflect the changes in the DNS
+servers as well: in /etc/resolv.conf.
+This file is temporary; the changes are temporary, and are erased on system restart.
+
+To prevent removal of the changes upon system restart: edit a configuration file in /etc/netplan
+
+
+
+Network troubleshooting
+There are many times where we have network issues. Tools for analysing the network:
+1. Ping
+    Test connectivity between two devices: ping <ip address>
+2. Traceroute
+    Traces the route which packets take to reach the <ip address>: traceroute <ip address>.
+    How it works: it uses TTL:
+        1. Computer sends an ICMP request to an intermediary device with TTL value of 1.
+        2. On reaching device, TTL value decreases to 0, and is dropped. It then responds to our
+        computer with "TTL exceeded".
+        3. Now on computer does the same thing as in 1: send back to the same device, but now with
+        TTL value of 2. Because it now does not decrement to 0, it will pass on to the next device.
+        4. The next device decrements once more the TTL value to 0. Then it will respond to our
+        computer with "TTL exceeded".
+        5. Our computer repeats step 1 to 5, with increasing TTL value by 1 each time; until the
+        target device OR traceroute hits its maximimum hop count: default is 30.
+    Along the process, it tracks all the devices it visited via the response of "TTL exceeded"
+    Output shows the
+        1. Hop number: Index of the hop
+        2. Round-Trip Time: Time taken to send to a device X. And, time taken it took for packet to
+        reach our computer
+        3. Devices: IP addresses of found devices that responded
+3. Netstat
+4. Tcpdump
+5. Wireshark
+6. Nmap
