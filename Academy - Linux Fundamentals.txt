@@ -876,6 +876,7 @@ Network troubleshooting
 There are many times where we have network issues. Tools for analysing the network:
 1. Ping
     Test connectivity between two devices: ping <ip address>
+    Sends ICMP packets and await for response. Then displays the response time.
 2. Traceroute
     Traces the route which packets take to reach the <ip address>: traceroute <ip address>.
     How it works: it uses TTL:
@@ -894,7 +895,89 @@ There are many times where we have network issues. Tools for analysing the netwo
         2. Round-Trip Time: Time taken to send to a device X. And, time taken it took for packet to
         reach our computer
         3. Devices: IP addresses of found devices that responded
+    If along any of the way, the device does not respond: we will get an output: * * *
+    This could be either the device is down, or device is blocking ICMP traffic, or a network issue
+    causing the packet to be dropped.
 3. Netstat
+    Displays active connections and associated ports with the connections and connection state.
+    It shows both local and remote connections; on device and with another device outside and its state
 4. Tcpdump
 5. Wireshark
 6. Nmap
+
+
+There are many mechanisms that are effective in securing Linux systems:
+1. SELinux
+    Security Enhanced Linux
+    MAC mechanism / model implemented. For system resources and applications; files and processes.
+    Built into the Linux kernel.
+    For example, you would put certain policy like a particular process cannot access a particular
+    file.
+2. AppArmor
+    Also MAC model. Difference from 1. is that this focuses on application by application. So not
+    system-wide. Handles the resources that each application can access to.
+    Example is like installed applications: one defines what or which files or directories the
+    application can access and or read or write. And where else it cannot do so.
+3. TCP wrappers
+    Uses a Host-Based Access Control Model. Used to restrict access to network services based on
+    IP address of the client's system.
+    How it works is that it intercepts incoming network requests. It compares the access control
+    rules and limit access to the network from unauthorised systems. 
+    System administrators can control which clients can access which specific network services
+    TCP wrappers are primarily responsible for network service access control.
+    Example: SSH, FTP, telnet, SMTP and more
+
+
+
+Remote Desktop Protocols
+
+Most common protocols are RDP for Windows and VNC for Linux
+
+XServer
+Also called X Window System and or X11.
+This is a fixed system of protocols and applications which will enable application windows on displays
+in a GUI.
+XServer is mainly in UNIX systems.
+
+Communication between the OS and what we see, the GUI, all happens through an X server.
+
+It uses the X protocol. The X protocol primarily uses TCP / IP as its transport base.
+
+XServer typically uses ports in the range of TCP/6001-6009 for communication between clients and servers.
+The first X display (:0) usually opens TCP port 6000.
+
+XServer allows remote access to a system, enabling users to access applications and data from anywhere.
+The X protocol will put the loading of GUI on the local computer; hence taxes it less than the remote computer,
+which is the case in protocols like VNC and RDP.
+
+X11 is unsecured - data transmitted is not encrypted. But we can use SSH to bypass this issue.
+
+More information on X displays:
+
+The X Window System supports the concept of multiple displays, each identified by a display number (:0, :1, :2).
+Each display corresponds to a separate instance of the XServer.
+
+On ports allocated: When a new X display is created (like :0), the XServer typically opens a TCP port starting from 6000.
+For example, the first X display (:0) usually opens TCP port 6000, while subsequent displays may use ports 6001,
+6002, and so on, up to 6009. You can change this port highest number to change the number of displays. It is not hard-capped.
+
+Client-server and ports: the allocated TCP port is used for client-server communication specific to the corresponding X display.
+Clients connect to the XServer using the appropriate TCP port associated with the display they want to interact with.
+
+
+
+
+
+
+Using SSH with X11 is known as X11 Forwarding.
+
+In Linux, there is a config file located in /etc/ssh/sshd_config; we can change the option to "yes"
+Then we can use a browser on a remote computer to perform a task via SSH: browsing the web:
+ssh -X <username>@<server> <path to browser>
+
+Now, even with SSH, there are still concerns. X11 forwarding opens a channel from the remote to the client.
+X11 Forwarding is bidirectional.
+This means that it is possible for the remote to send back X11 commands to the client.
+
+X11 by itself, is even more insecure. The communication is entirely unencrypted; an attacker can read
+keystrokes, obtain screenshots, move the mouse cursor, send keystrokes from the server over the internet. 
