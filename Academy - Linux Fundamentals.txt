@@ -1080,3 +1080,57 @@ iptables has five components that you can manage:
     This are the follow-up actions to apply to the (target of) matches
     Examples: ACCEPT, DROP, REJECT, LOG, ...
 
+
+
+System Logs
+Different types of logs exists on Linux: We have to review them for security
+The folder is in /var/log: (variable) things that are prone to change, such as websites, temporary files (/var/tmp) and databases.
+1. Kernel
+    /var/log/kern.log
+    Contains details about hardware drivers, system calls and kernel events
+2. System
+    /var/log/syslog
+    Contains information about system-level events: services start stop; login attempts; system reboots
+3. Authentication
+    /var/log/auth.log
+    Contains information about user authentication attempts - both successful and failed.
+    Syslog also contains user login information; but here is more focused on authentication
+    Firewall messages will appear here as well if suspicious traffic is detected on a port
+4. Application
+    /var/log/<applicationName>/error.log
+    Defined by the application. For databases like MySQL, this can include logs as to how the data is being processed. 
+    
+5. Security
+    Depends on application and or tools in use.
+
+Access Logs vs Audit Logs
+Access logs are focused on user and process activity on the system - login attempts, file accesses, network connections
+Audit logs are focused on security-relevant events on the system - modifications to system configuration files or attempts
+to modify system files or settings.
+Access logs: you can find them in /var/log/<applicationName>/<application-defined-access-log-file>
+
+Regarding logs: useful commands to use with them are like "tail", "grep" and the stream editor tool sed.
+
+
+Solaris
+This is a Unix-based OS that is proprietary and not open-source. The point of placing it in the tutorial is because
+it has its own set of commands. Solaris focuses more on reliability and large data; so is used in many financial and government
+sectors.
+
+Differences: main Solaris commands
+
+showrev
+Displays system information just like uname -a in Linux
+
+Installing packages: pkgadd -d <package name>
+
+Finding files:
+find / -perm -4000
+Uses - before the permission value of 4000.
+
+Debugging software issues:
+truss
+To trace system calls by a command: Example is "ls":
+truss ls
+
+Then the output will show systems calls made

@@ -1,0 +1,37 @@
+Metasploit is Ruby-based.
+Idea is that you can write, test and execute code (exploits)
+Also, you can take exploits (code) from existing databases written for existing
+vulnerabilities via Metasploit.
+
+Metasploit has two parts of its product - Pro and Framework.
+Differences are features. Pro version has its own console as well.
+
+We typically interface with the Metasploit framework via the console: msfconsole.
+It is the only way you can access most of the features within Metasploit. So it is
+good to be familiar with it.
+
+All the base files relating to the framework are in /usr/share/metasploit-framework
+
+So we can find modules in /usr/share/metasploit-framework/modules,
+plugins in /usr/share/metasploit-framework/plugins,
+scripts in /usr/share/metasploit-framework/scripts,
+tools in /usr/share/metasploit-framework/tools
+
+----------------------------------------------------------------------------------------
+We start the interaction with the framework via "msfconsole"
+
+The concept to begin running an exploit also follows outside using the framework: enumeration first.
+In fact, the workflow of using the framework mirrors that of the approach without using
+the framework
+
+This engagement structure in Metasploit's framework is composed of five parts:
+1. Enumeration
+2. Preparation
+3. Exploitation
+4. Privilege Escalation
+5. Post-Exploitation
+
+Knowing the above by heart enables us to quickly dive into which features of MSF that
+we wish to use. So it is wise to be very clear on which section we are doing at any given
+moment.
+
