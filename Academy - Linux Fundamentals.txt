@@ -929,6 +929,10 @@ There are many mechanisms that are effective in securing Linux systems:
 
 
 
+
+
+
+
 Remote Desktop Protocols
 
 Most common protocols are RDP for Windows and VNC for Linux
@@ -981,3 +985,98 @@ This means that it is possible for the remote to send back X11 commands to the c
 
 X11 by itself, is even more insecure. The communication is entirely unencrypted; an attacker can read
 keystrokes, obtain screenshots, move the mouse cursor, send keystrokes from the server over the internet. 
+
+
+
+
+Alongside with X11, X Display Manager Control Protocol (XDMCP) is used by the X Display Manager for communication
+through UDP port 177 between an X terminal and computers operating under UNIX / Linux
+
+Its purpose is enabling communication between XDM and remote X terminals, allowing users to start and manage
+remote X sessions from their local machines.
+
+Users can connect to remote systems and use them as though they are local machines.
+
+It is, however, insecure and can be exploited through a man-in-the-middle attack.
+An attacker can intercept the communication; then run arbitrary commands on the servers.
+
+
+
+
+Virtual Network Computing (VNC)
+This is used as a remote desktop sharing system. It uses the Remote Framebuffer (RFB) protocol.
+
+
+The remote endpoint where the user sits (i.e. the display plus keyboard and/or pointer) is called the
+RFB client or viewer.
+The endpoint where changes to the framebuffer originate (i.e. the windowing system and applications)
+is known as the RFB server.
+
+
+It transmits keyboard and mouse events from one computer to another, and relays graphical screen updates back
+in the other direction over a network.
+
+One of the more common protocols used for remote graphical connections for Linux hosts.
+
+VNC is taken to be secure. The reason being is that it uses encryption and requires authentication before use.
+
+Here, it is mentioned that there are two concepts of VNC servers being implemented: 
+1: The server offers the actual screen of the host computer for user support.
+Because the keyboard and mouse remain usable at the remote computer, an arrangement is recommended.
+2: The second group of server programs allows user login to virtual sessions, similar to the terminal server concept.
+
+Convention is that TCP port 5900 is used. Display 0 is represented here.
+So likewise, 5901: Display 1; 5902: Display 2...
+
+
+
+Firewall Setup
+Firewall is meant for controlling and monitoring traffic inflow and outflow of internal networks.
+Linux has its own set of tools to do so; here the notes lists out the tools and background.
+
+iptables
+This is a utility to setup filters for network traffic.
+There are many tools to configure firewalls; not just iptables; each tool has its own rules and approaches.
+Some other tools: nftables, ufw (uncomplicated firewall)
+
+However, note that all these tools build on top of iptables. So learning iptables is most fruitful.
+
+iptables has five components that you can manage:
+1. Tables
+    Tables in iptables
+    Used to categorise and organise firewall rules based on the traffic the firewall is intended to handle
+    There are a few tables - filter, nat, mangle - each having its own set of tasks
+        filter: filters traffic based on IP addresses, ports and protocols.
+        nat: modifies source and destination IP addresses of packets. Stands for network address translation.
+        mangle: modifies source headers of network packets.
+
+2. Chains
+    These organise rules that define how network traffic should be filtered or modified. There are two chains
+    in iptables:
+        1. Built-in chains
+            Pre-defined; automatically created when table is created. Each table has different built-in chains.
+                Filter table:I
+                    INPUT: filters incoming traffic
+                    OUTPUT: filters outgoing traffic
+                    FORWARD: forwards traffic between network interfaces
+                NAT table:
+                    PREROUTING: modifies destination IP address of incoming packets before routing table processes them
+                    POSTROUTING: modifies source IP address of outgoing packets after routing table processed them
+                mangle table:
+                    PREROUTING
+                    OUTPUT
+                    INPUT
+                    FORWARD
+                    POSTROUTING
+        2. User-defined chains
+            One can define a group of chains: then arbitrarily impose rules to the chains
+3. Rules
+    The rules are just the criteria for filtering network traffic and actions to take for packets that match the criteria.
+
+4. Matches
+    This could be like source / destination IP address, or port number, or any type of possible header you want to match.
+
+5. Targets
+    This are the follow-up actions to apply to the (target of) matches
+    Examples: ACCEPT, DROP, REJECT, LOG, ...
+
