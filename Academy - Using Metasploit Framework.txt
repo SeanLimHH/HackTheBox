@@ -35,3 +35,87 @@ Knowing the above by heart enables us to quickly dive into which features of MSF
 we wish to use. So it is wise to be very clear on which section we are doing at any given
 moment.
 
+Metasploit modules are prepared scripts. In the real world, many times these scripts may not work.
+The reason being is that each target hosts may have a different set of implementations that may
+render a particular module ineffective.
+
+It is thus useful to think of metasploit as a supplementary tool, a helper.
+
+If we type show all in the msfconsole, we will see a list of modules.
+
+The way metasploit modules are structured are via folders.
+
+The folder structure has a meaning: <No.> <type>/<os>/<service>/<name>
+
+Each module has its own index as well. 
+
+
+
+First tag <type>
+This represents what kind of general goal the code will accomplish
+
+One of the many types is "payload".
+For such a type, it is special in the sense that the syntax is "use <no.>"
+Then, only the following modules can be interactable (called initiators) with this type:
+1. Auxiliary
+    Helper functionality; admin capabilities. Sniffing, fuzzing...
+2. Exploits
+    Modules that exploit a chosen vulnerability
+3. Post
+    These are modules that gather more information
+
+
+
+Second tag <os>
+Different OS has different architectures. Different modules may work only for some OS not all.
+
+
+Third tag <service>
+This service refers to the service on the vulnerable machine.
+For some modules, this service tag can refer to more general activity; scanning...
+
+
+Last tag <name>
+This refers to the name of the exploit; short-description.
+
+
+
+Since there are so many modules. Let us say you have a module you want to use in mind.
+Then use "search <module name>"
+We can specify the search. For example, module type = "exploit", we can run command:
+search <exploit name> type:exploit
+
+Some useful search parameters:
+cve:year
+platform:<os>
+type:<auxiliary/exploit/post>
+rank:<rank>
+<pattern>
+
+
+The general workflow:
+1. Enumeration: we scan for open ports and running services on the ports.
+Here, if we run nmap in msfconsole, we can already see the vulnerabilities after scan.
+
+We can also use other tools like searchsploit here.
+After we discover a vulnerability, we should focus on the identifier of the vulnerability
+
+Then run "search <vulnerability name / identifier>"
+We will see a list of possible modules (scripts) to be used.
+
+To use, we run "use <script number of output list>"
+If the exploit requires some parameters to be set, here they will ask you.
+(It will appear that "Required" = yes in one column)
+You can see via show options.
+
+Some parameters: RHOST or RHOSTS.
+This stands for Remote Host or Hosts. You should set it to the IP address(es)
+of the vulnerable machine or machines:
+set RHOST <IP address>
+
+If you run setg instead of set above, you make the options selected permanent
+until restart.
+
+Then once done, call "run" to run the exploit.
+It should transit you to inside a shell for example, for an exploit that gives shell access.
+Then you can just proceed from here.
