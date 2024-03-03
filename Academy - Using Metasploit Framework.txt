@@ -112,6 +112,7 @@ Some parameters: RHOST or RHOSTS.
 This stands for Remote Host or Hosts. You should set it to the IP address(es)
 of the vulnerable machine or machines:
 set RHOST <IP address>
+You should also set the Local host and ports if necessary. LHOST
 
 If you run setg instead of set above, you make the options selected permanent
 until restart.
@@ -119,3 +120,128 @@ until restart.
 Then once done, call "run" to run the exploit.
 It should transit you to inside a shell for example, for an exploit that gives shell access.
 Then you can just proceed from here.
+
+
+Regarding exploits: each has its own OS target. or service type. or anything custom.
+The types can be predefined by the module owner
+We can see the targets after selecting a module.
+
+After selecting the exploit, we can call "info" to get more information regarding
+the exploit. It is actually good practice to call "info" before running the exploit.
+
+This is so that we know the effects of the exploit on the system.
+
+Then after selecting the module "show targets" will display all the possible OS versions
+that the exploit is intended for.
+
+If we know the OS version of our target, we can change it to target that: set target <index number>
+
+
+To identify correctly a target:
+1. Obtain a copy of the target binaries
+2. Use msfpescan to locate a suitable return address
+
+
+
+Payloads in Metasploit
+Payloads are the action to delivering an exploit. Like a verb for the noun exploit.
+
+These are modules that aid exploit modules in (typically) returning a shell to the attacker (you)
+Payloads typically are bundled with the exploit.
+Then, they will usually include some sort of establishing a reverse connection to the attacker.
+
+Once a connection to the target's computer shell is established, we can say that we established a
+foothold in the target's computer.
+
+There are three types of payload modules in the Metasploit framework: Singles, Stagers and Stages.
+A module can have a mixture of these three payload modules.
+
+Singles
+A single payload contains everything required for the exploit. In a way, they are self-contained.
+
+Stages
+A staged payload is an exploitation process.
+Typically modularised and functionally separate.
+They work in chains (chaining the attacks).
+Stage 0: Shellcode is sent to target machine's vulnerable service. Only purpose is to initialise
+a connection to the attacker's machine. Also known as reverse connection.
+
+Stagers
+Stagers work with staged payloads to do certain tasks.
+They wait on the attacker's machine, ready to establish a connection to the victim host once
+the stage completes its run on the remote host.
+Generally used to set up network connection between attacker and victim.
+
+
+Reverse connections
+Often less likely to trigger prevention systems compared to direct connections:
+1. It is a legitimate software behaviour
+2. They appear as outbound connections (made from the victim's computer, so more trust)
+
+
+Meterpreter Payloads
+A Meterpreter payload is part of Metasploit framework.
+Designed to be interactive shell-like environment on target machine.
+
+Uses DLL injection - Dynamic Link Library code injected into the address space of a running
+process.
+Injection of code into the address space of a running process introduces additional functionality
+or modifications into that process while it is actively running. 
+Generally, this enables changing the entire functionality of the service running to an attacker's
+liking.
+
+Meterpreter payloads Meterpreter resides completely in the RAM of the remote host and leaves no
+traces on the hard drive, making it very difficult to detect with conventional forensic techniques.
+Furthermore, it is persistent across reboots or system changes. So in effect they are powerful.
+
+
+We can list payloads via "show payloads".
+We can observe that there are too many to choose from, so we need to know which one to pick.
+Also, we can create our own payloads - using msfvenom.
+
+Typically we use grep with "show payloads" : "grep <payload name> show payloads"
+
+Then call "set payload <payload number>"
+
+And "show options"
+
+Then "run"
+
+For Meterpreter, you will get shell access but it is a Meterpreter prompt.
+So it is different from a Windows command-line. Type "help" for more information.
+
+You can open a shell via Meterpreter: "shell".
+At this point, you will observe, by the stager, "Channel 1 created".
+This channel was created by the Meterpreter stager activated on our machine to await
+a connection request initialised (by the staged payload) by our victim's machine.
+
+There are many payload types. Popular ones by penetration testers are Empire and Cobalt
+Strike payloads.
+
+
+Encoders
+Mainly used to avoid antivirus detection and or other security controls that uses
+signature-based matching.
+This was in the past. Nowadays, many IPS and IDS manufacturers have found very good ways
+to deal with this method.
+
+There was traditionally a very popular encoder that significantly evaded a lot of detection:
+Shikata Ga Nai, which translates to "It cannot be helped" or "Nothing can be done about it,"
+abbreviated as SGN encoding. However, in recent times, this trend is about to change.
+
+General idea of why it was so effective at evading antivirus signature-based matching:
+
+A lot of randomness in the payloads and even the processes themselves.
+
+The randomness extends to the arrangement and substitution of instructions.
+This made signature-based matching not very effective. Because each payload looks different
+from the past.
+
+
+Metasploit has many of its own payloads and encoders: "msfpayloads" and "msfencode"
+
+Creation of custom payload involves doing so via msfpayloads then piping to msfencode
+
+After 2015, metasploit combined both into msfvenom: it does both.
+
+The idea of encoding a payload before delivering it is to avoid antivirus detection.
