@@ -245,3 +245,88 @@ Creation of custom payload involves doing so via msfpayloads then piping to msfe
 After 2015, metasploit combined both into msfvenom: it does both.
 
 The idea of encoding a payload before delivering it is to avoid antivirus detection.
+
+
+
+Databases in Metasploit
+These are used to keep track of your results.
+Uses PostgreSQL
+
+We must thus first ensure that outside MSF, we are running PostgreSQL service:
+sudo service postgresql status
+
+then start it:
+sudo systemctl start postgresql
+
+At this point, the database service is running.
+Then we can initialise with msf:
+sudo msfdb init
+I had to drop the sudo for my case
+
+After which, we will need to connect to this database:
+sudo msfdb run
+
+For any issues faced, we can re-initialise the database:
+msfdb reinit
+
+This does however, remove all existing data.
+
+If we are inside the msfconsole, we can run "help database" to see all associated
+commands with the database.
+
+Using the database:
+Workspaces
+These are like folders in a project.
+In msfconsole: type "workspace" to show the workspaces.
+-a: add; -d: delete:
+workspace -a <new_workspace>
+workspace -d <existing_workspace>
+To switch to a workspace:
+workspace <workspace_to_switch_to>
+
+workspace -h shows all options
+
+
+How to save data of nmap results?: Use db_nmap inside metasploit instead of "nmap"
+so example is db_nmap -sV -p- <IP address> instead of nmap -sV -p- <IP address>
+
+Then we would run afterwards db_export -f <format> for backing up the results.
+
+Querying for results:
+Use the metasploit console:
+
+hosts
+This shows all the hosts stored in the database of the scans.
+
+services
+This behaves the same as hosts - shows all the services with descriptions of the scans.
+
+creds
+This enables you to visualise the credentials gathered during your interactions with the host.
+
+
+
+Plugins in metasploit
+All plugins are stored in /usr/share/metasploit-framework/plugins
+
+To load, we call "load <plugin_name>"
+
+If you want to import a plugin or set of plugins from an external source: idea is to
+copy and paste to the plugins folder.
+
+It should be Ruby files with extension .rb
+
+
+Sessions
+These are like control interfaces for your modules.
+These are connections established with the target machine only after a successful 
+exploit or brute force attack.
+
+To start a session: sessions -i 1
+To view existing sessions: sessions
+
+In Metasploit, jobs are known as background processes. Also encompasses non-background tasks
+We can run an exploit in the background: exploit -j
+
+To list all jobs: jobs -l
+
