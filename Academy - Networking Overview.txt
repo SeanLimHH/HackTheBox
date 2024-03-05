@@ -1,0 +1,151 @@
+
+ISPs:
+
+DNS -> Internet -> ISP
+
+Then ISPs connect to either home or companies:
+Home:
+
+ISP -> Router -> Devices
+
+Companies:
+
+ISP -> Router -> Switch (Here we enter the company's network):
+1. Switch -> DMZ -> Web server
+2. Switch -> IP Phone
+3. Switch -> Printer
+4. Switch -> Client Host
+The switch and router in this case should be on an administrative network
+The printer should be on a separate network, and the client hosts on a separate network
+The printer should also never talk to the Internet
+
+Website: Uniform Resource Locater (URL)
+This is considered as a Fully Qualified Domain Name (FQDN)
+
+Consider: We visit a website
+A website can be thought of as an address
+The router is an way for us to connect to the Internet
+Our packets that we send to the router will go through the ISP.
+
+The ISP will observe the DNS to resolve the corresponding IP address.
+
+Wide Area Network (WAN): known as the Internet
+
+Local Area Network (LAN) / Wide Local Area Network (WLAN)
+No difference between them.
+Typically, they will assign IP addresses to your device.
+This is done via a process called Dynamic Host Control Protocol (DHCP)
+
+Virtual Private Network (VPN)
+There are 3 kinds:
+1. Site-to-site VPN
+    Used to join networks in different places together; to be treated as Local
+2. Remote Access VPN
+    This makes the person intending to join the VPN have his client create a software-based
+    representation that mimics a network interface card (NIC) found in computers.
+    This is a virtual network interface.
+    After creation of this interface, the person can just access the remote network as
+    though his computer is part of the network.
+
+    An example is HackTheBox, which uses OpenVPN. This OpenVPN client creates a TUN adapter
+    (TUN stands for tunnel) which enables us to join the labs.
+
+Typically, when devices connect to a VPN, the device creates a routing table that will
+determine how traffic flows. This table shows which IP addresses are accessible within the
+network and which ones are not. Those that are not are accessed through the internet.
+
+In a Split-Tunnel VPN, this routing table only creates routes for required specific networks
+that can only be access via the VPN. So, other routes, other addresses, will all proceed to the
+internet from the client-side. Hence it is called split-tunnel, because there are two tunnels
+that are inaccessible from each other. HackTheBox uses this which promotes privacy.
+
+In the case of company networks, Split-Tunnel VPNs are not recommended since if the client
+is infected with malware, it will be harded to debug
+
+3. SSL VPN
+
+This is a VPN that is more associated with corporate networks than home networks.
+This uses the SSL/TLS protocol to provide secure remote access to private networks.
+The process of SSL VPNs:
+    1. Your device connects to the SSL VPN server using a web browser or a dedicated
+    SSL VPN client software.
+    2. Then, your browser provides required authentication credentials to the SSL VPN server to be 
+    authenticated.
+    3. Once authenticated, the SSL VPN server will establish a secure SSL/TLS connection
+    with your client. This connection encrypts all data flows between the client and the server
+
+SSL VPN servers are literally dedicated computers that sit in a company's server rack, that handles
+the exchange of cryptographic keys with clients that want to interact with the company's internal network.
+
+
+
+
+Global Area Network (GAN)
+
+The Internet is an example of this. Huge companies maintain their own isolated networks that can
+span across countries (has many WANs), and are considered GANs. Typically undersea cables or satellite
+transmission
+
+
+Metropolitan Area Network (MAN)
+
+Connects multiple LANs.
+Typically, these are individual branches of a company connected to a MAN via leased lines.
+
+
+Personal Area Network (PAN) or Wireless Personal Area Network (WPAN) 
+Example is mobile hotspots
+
+
+Network Topology
+This is a term to refer to the arrangement of logical connections of devices in a network.
+Includes clients, servers, network components like routers, switches, bridges.
+
+Has 3 main areas:
+
+1. Connections
+    Wired and Wireless.
+    Wired will include the cable types like coaxial cable, twisted pair cables ...
+    Wireless will include the different types too: Wi-Fi, Cellular, Satellite...
+
+2. Nodes (Network Interface Controllers)
+    These are like connection points:
+    Repeaters, hubs, firewalls, switches, routers, gateways, bridges...
+
+3. Classification
+    Has a few types:
+    Point-to-point, bus, ring, star, mesh, daisy-chain...
+
+
+Point-to-point Topology
+A straightforward physical link connects two devices.
+Not to confuse with peer-to-peer architecture.
+
+Bus Topology
+No central network component; every host can control the signals sent.
+One host sends; others evaluate
+
+Star Topology
+All hosts connect to one central network component. Typically a hub, router or switch.
+This central network component will redirect data to intended devices.
+
+Ring Topology
+For each host in a ring arrangement: one cable enters and one cable leaves.
+Coordination is done via a protocol all hosts agree on.
+
+Mesh Topology
+This is situational. There are two general structures: fully-meshed and partially-meshed.
+For a fully-meshed structure: this is like a complete graph.
+Used in WAN to ensure high reliability and stability.
+This setup: important network nodes like routers can be networked together. If one fails,
+others can work without problems.
+
+In a partially-meshed structure, each endpoint is connected by only one connection.
+
+Tree Topology
+Often used in large companies.
+The server is the root, then its childrens are ethernet switches, then host computers.
+
+Daisy Chain Topology
+Often used in automation technology.
+A computer connects to a computer connects to another computer like a tree with one child only.
