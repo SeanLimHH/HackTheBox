@@ -149,3 +149,99 @@ The server is the root, then its childrens are ethernet switches, then host comp
 Daisy Chain Topology
 Often used in automation technology.
 A computer connects to a computer connects to another computer like a tree with one child only.
+
+
+
+
+
+
+
+Proxies
+A proxy is just an intermediary device like a middleman that must be able to inspect data flowing
+through it.
+If it cannot inspect data through it; it is called a gateway.
+Generally operates in the application layer; layer 7.
+
+
+Dedicated Proxy / Forward Proxy
+This is a device that forwards your requests.
+Because as per the definition of proxies, the requests can be inspected and modified before forwarding.
+
+In corporations, these are known as web filters. Malware attempting to communicate with command-and-control
+(C2) servers or malicious websites must first bypass the proxy server.
+
+Proxy-aware malware: These are malware that can recognise the above; and will rely on the underlying
+operating system's network stack, such as WinSock in Windows, to establish network connections.
+This means that malware can easily bypass the proxy server and communicate with external servers.
+
+Most web browsers have a setting: System proxy. This means that requests made by these browsers will go
+through system-configured proxies.
+If the malware utilizes WinSock (Native Windows API), it will likely be proxy aware without any additional
+code.
+
+A browser that does not follow this proxy setting is Firefox.
+It does not use WinSock and instead uses libcurl, which is its own networking library.
+If a malware wishes to target Firefox, it has to change the proxy settings to use libcurl.
+
+Alternative to the above's approach, an attacker can write a malware using DNS as a C2 mechanism.
+However, this is combatted if the organisation monitors the DNS via tools like Sysmon.
+
+Burp Suite is a tool that cybersecurity professionals use to analyse packets between web applications and 
+web browsers. It uses a proxy server as an intercepting server between the browser and application.
+
+This enables users to analyse and manipulate web traffic in real-time; and or inspect individual requests
+and responses.
+Burp Suite also has other tools that can help detect vulnerabilities.
+
+
+
+Reverse Proxy
+Reverse functionality of a forward proxy. Filters incoming ones.
+Example is CloudFlare. Idea is that it reads incoming requests. CloudFlare is used for the reason that they
+can absorb a lot of DDoS attacks via their mechanisms implemented: some examples:
+1. Spreads out the entire network across the globe via dispersion of DDoS attack. Uses an Anycast network.
+2. Traffic filtering
+3. Enhanced network infrastructure that better deals with such attacks on different network layers.
+4. AI systems to adapt to attack patterns.
+5. Real-time monitoring and response
+and many more...
+
+This concept of reverse proxy is useful if you want to open up a backdoor - set it on a port. When a client
+connects to this port, forward the client's data to the attacker via this same port.
+This is useful for bypassing firewalls or logging.
+
+If an attacker also gets access somehow to the system via SSH - a reverse proxy can be set up to send back
+web requests through an SSH tunnel. This will evade IDS detection.
+
+
+
+Web Application Firewall (WAF)
+ModSecurity is a open-source example.
+Such a firewall is meant to protect web applications from various attacks and vulnerabilities.
+
+A WAF simply just monitors the flow of HTTP or HTTPS traffic through them and has tools to deal with
+suspicious behaviours.
+
+
+All proxies can either be transparent or not. If transparent; the client will not know about its existence.
+This is just a setting.
+Example of non-transparent proxies: enterprise networks, corporate environments, and public Wi-Fi hotspots.
+Centralised proxy servers are dedicated to authenticate and give access.
+
+
+
+
+Networking Model
+7 layers and they describe data flow through them.
+
+Regarding data flow, inter-layer communication utilises a format called a Protocol Data Unit (PDU).
+
+Moving up the layers: Sender
+Every layer will adds its own header and footer to the data. Then this new whole chunk becomes the data that
+is sent the next layer.
+
+Moving down the layer: Receiver
+The reverse is done: strip away the headers off the data one-by-one as you go down the layers.
+
+The concept of wrapping the data with additional information as it travels up is called encapsulation.
+
