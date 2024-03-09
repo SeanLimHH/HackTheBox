@@ -245,3 +245,148 @@ The reverse is done: strip away the headers off the data one-by-one as you go do
 
 The concept of wrapping the data with additional information as it travels up is called encapsulation.
 
+
+The OSI model can be sort of categorised: layers 2 to 4 are transport-related; whereas layers 5 to 7 are
+application-related.
+
+
+TCP / IP model
+These are protocols.
+IP is located on layer 3 whereas TCP is located on layer 4.
+There are a few tasks that the protocol does:
+1. Logical addressing
+2. Routing
+3. Error & Control Flow
+4. Application Support
+5. Name Resolution
+
+
+The network layer is layer 3. It controls data packets; which are transferred from node to node.
+
+The network layer is generally in charge of logical addressing and routing.
+There are quite a few protocols in this layer. A protocol also is just a collection of rules in
+the layer.
+
+Each host has an IP address and a Media Access Control address (MAC).
+
+It is necessary for inter-networks to utilise an IP address to communicate.
+The MAC and IP address are generally the to that helps identify the address of receiver.
+Conceptually, one can think of the MAC as more specific.
+
+
+IPv4
+This is a method of assignment of IP addresses.
+It is a 32-bit binary number = 4 bytes = 8 octets.
+It is conventional to refer by the bytes; the octets; and to identify by groups of 8 bits.
+
+The IP address can be divided into two parts: a host part and a network part.
+The router assigns the host part; the network administrator assigns the network part.
+
+In the past; IP addresses are further classified - class A, B, C, D and E. It was just a way
+to classify different types of networks based on the size. But this is outdated.
+
+
+
+Subnet Masks
+In addition to the above's approach of classification, another approach is via subnetting.
+This basically uses netmasks. The idea of this netmasks is playing with bitwise AND operator;
+by performing a logical AND, having a mask of the form 1100 applied to a example value 1011
+will "filter" out the first two bits; and yield 1000. The same concept is applied here.
+A subnet mask typically define how many '1's there are in the mask: via the CIDR.
+
+
+
+Default Gateways
+This is an IP address of the router.
+This router will connects the local network to other networks or the internet.
+Mainly handles routing traffic between networks.
+
+
+
+Broadcast Address
+Typically the last address column. To get this value; apply the subnet mask on the IP address.
+A broadcast typically does not need a recipient. It sends to all devices in the network. It
+will include its own IP address.
+
+
+
+Subnet's network address
+We assume the IPv4 address as it is. Then we split it into two parts - network and host parts.
+The second part - host part, determined by the split determined by CIDR, when set to 0,
+makes the entire IP address = network address.
+
+A network address is critical for delivery of data packets.
+It determines if a packet should be routed within the network or out of it (to another subnet
+via the gateway).
+
+
+
+
+
+Subnetting into smaller networks
+1. Determine the number of hosts you can have maximally
+2. Determine how many hosts you want in a subnet
+3. AND Determine how many subnets that you want
+You must ensure that the total number of hosts in 2 and 3 cannot exceed 1.
+
+The idea is that let us say you have 254 hosts (2 reserved for network address and broadcasting).
+Then you want 3 subnets; maximally you can have (256 - 2*3)/3 hosts in one subnet.
+So it depends on the combination of number of subnets and number of hosts.
+With reference to YouTube video on how to do this: Given 192.168.50.0/24:
+/24 => 1 network of 256 hosts.
+/25 => 2 networks of 128 hosts
+
+The division becomes a 3 part - network, subnet, host.
+Visually: we have for /24:
+11111111 11111111 11111111 00000000
+Here we observe that the subnet part is empty; we only have network and host.
+
+For /25:
+11111111 11111111 11111111 `1`0000000
+The backtick here is actually the subnet part now; and we have 2. Because with /25, we can use
+the 1 in the backtick as a flag or marker for subnet index; and there are two possibilities.
+But we also forgo more hosts that we can assign.
+
+For /26:
+11111111 11111111 11111111 `11`000000
+The backtick here is actually the subnet part now; and we have 4 subnets. Because with /26, we can use
+the 2 `1`s in the backtick as a flag or marker for subnet index; and there are two possibilities.
+But we also forgo more hosts that we can assign.
+
+So from this, let us say /26, if in the backtick section we have instead `10`, we can interpret
+that the IP address belongs to the 3rd index; 3rd subnet out of the total 4 subnets. 
+
+The above is a good way to interpret an IP address and its subnet it belongs to.
+
+Subnetting benefits and purpose:
+1. You can separate the networks based on purpose - and in a way, enforce security policies on a particular
+subnet. So this indirectly promotes security. This also makes it easier to manage policies applied.
+2. Due to categorisation, you can also better network performance with subnets since you can route different
+data packets to different subnets (assuming you have devices in different subnets)
+
+
+
+
+A trick used to help identify whether networks are together:
+It is possible to identify what octet of the IP Address may change by remembering those four numbers.
+Given the Network Address: 192.168.1.1/25, it is immediately apparent that 192.168.2.4 would not be in the
+same network because the /25 subnet means only the fourth octet may change.
+In the example, you would compare the 1.1 and 2.4 parts. You can tell from this difference that the two IP
+addresses must not be on the same subnet; because if so, only the last part, the "1" and "4" would differ,
+not the first part, the "1" and "2".
+
+Also, you can quickly tell how big a subnet is using modulo operator:
+/25 => 8 bits in an octet; so we can infer that there is 1000 0000.
+Then, 2^7 = 128 => 128 addresses.
+If /26 => we can infer 2 '1's on LHS, so we get: 1100 0000. So 2^6 addresses.
+
+
+
+Broadcast address
+Like the above, if we set all the bits in the IPv4 address host part to 1, we can get the
+broadcast address
+
+
+
+There is a constraint in the total number of IP addresses possible due to it being 32-bits.
+Hence we have IPv6; more IP addresses can be assigned.
