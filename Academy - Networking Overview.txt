@@ -285,6 +285,8 @@ The router assigns the host part; the network administrator assigns the network 
 In the past; IP addresses are further classified - class A, B, C, D and E. It was just a way
 to classify different types of networks based on the size. But this is outdated.
 
+There is a constraint in the total number of IP addresses possible due to it being 32-bits.
+Hence we have IPv6; more IP addresses can be assigned.
 
 
 Subnet Masks
@@ -387,6 +389,77 @@ Like the above, if we set all the bits in the IPv4 address host part to 1, we ca
 broadcast address
 
 
+MAC addresses
+Also known as physical address, because each network physical device (card) has one of this
+address.
+Each host in a network has its own 48-bit MAC address.
 
-There is a constraint in the total number of IP addresses possible due to it being 32-bits.
-Hence we have IPv6; more IP addresses can be assigned.
+There are different types of MAC standards as well:
+1. Ethernet
+2. Bluetooth
+3. WLAN
+Each correspond to each physical network interface (card)
+
+When an IP packet is sent, it is addressed on layer 2 to the destination host's physical
+address or to the router. Each packet has both the sender and receiver's MAC address.
+
+
+Breakdown of MAC addresses
+A MAC address consists of 6 bytes.
+First 3 bytes correspond to the Organisation Unique Identifier (OUI). This is set by IEEE
+which is based on the manufacturer.
+The last 3 bytes correspond to the Individual Address Part or Network Interface Controller (NIC)
+This is set by the manufacturers themselves.
+
+MAC addresses and routing:
+If the device is on the subnet, the physical address is used.
+If the device is not on the subnet, the Ethernet frame (unit of data transferred over an Ethernet
+network) is addressed to the router's physical address.
+
+
+In IPv4, Address Resolution Protocol is used to determine the MAC address associated with IP
+addresses in the same subnet. ARP resolves IP to MAC addresses.
+
+There are also reserved bits within MAC addresses:
+
+The last bit in the first octet: Identifies the device as unicast (0) or multicast (1).
+The second last bit in the first octet:
+If 0: MAC address is globally unique; assigned by IEEE.
+If 1: MAC address is local.
+
+Since MAC addresses can change, it is not good to use as means of security.
+Few attacks on MAC addresses:
+MAC spoofing: Fake a MAC address
+MAC flooding: Spams many packets with different MAC addresses. This overloads the MAC address
+table
+MAC address filtering: Configuration of network to allow certain MAC address only from accessing
+
+Unicast means that packets sent will reach only one specific host.
+Multicast sends packets once to all hosts for them to accept or not.
+
+Multicast address is unique in address.
+
+
+Address Resolution Protocol
+This is a network protocol on LAN.
+Links IP addresses to MAC addresses.
+The mapping enables communication between devices.
+When a device wishes to communicate: it sends a broadcast message with the destination IP address
+and its own MAC address.
+Device with that destination IP address will respond with an ARP reply.
+This process is called ARP resolution
+
+
+
+"who has" message
+This is a type of request sent on a network to discover MAC addresses in the network.
+Particularly to find out which IP addresses has which MAC address.
+
+
+With this, it is possible to fake one's identity - ARP spoofing.
+ARP spoofing / ARP poison routing / ARP cache poisoning
+This is the attack where the attacker creates false ARP messages over a LAN.
+Goal is to enable mapping of the attacker's device (MAC address) to an IP
+address of a legitimate device within the network.
+The moment this is successful, the attacker can receive messages on behalf of the IP
+address of the legitimate device, as well as send on behalf of it.
