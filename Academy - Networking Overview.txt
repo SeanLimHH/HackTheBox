@@ -463,3 +463,98 @@ Goal is to enable mapping of the attacker's device (MAC address) to an IP
 address of a legitimate device within the network.
 The moment this is successful, the attacker can receive messages on behalf of the IP
 address of the legitimate device, as well as send on behalf of it.
+
+
+IPv6 is the successor to IPv4. It has now 128 bits.
+
+There are 3 types of IPv6 addresses:
+1. Unicast: One-to-one communication
+Every device has >= 1 unicast address
+2. Anycast: Used for load balancing or efficient routing.
+A chosen group of devices will be assigned >= 1 Anycast address each.
+Each address can be used for a particular service. So different services can use different
+addresses.
+3. Multicast: Used for one-to-many communication.
+Not all device have this. Each device can have >= 0 multicast address.
+
+So each device can be assigned a combination of the above 3 types of addresses.
+
+Since IPv6 addresses are 16 bytes, we address them by hexadecimals normally.
+The address is split into 4 groups of 4 hex numbers with delimiter ":"
+Leading zeroes are left out via the notation of "::"
+
+IPv6 addresses also has two parts - network prefix and host suffix (network identifier)
+
+Prefix length follows CIDR notation - /64 means 64 bits.
+The host part, the suffix, the network identifier, is derived from a 48-bit MAC address.
+The network identifier is extended to 64 bits via these 48-bits in the MAC address.
+The extension is performed by splitting the 48 bits into 2 24-bits; then inserting in the middle
+the fixed value "FF:FE".
+After which, the 7th bit from the left is set to 1 for locally administered; 0 otherwise.
+
+
+Two common internet protocols - User Datagram Protocol (UDP) and Transmission Control Protocol (TCP)
+TCP: establishes a connection via a three-way-handshake.
+This TCP connection occurs as we attempt to connect to a server (consider entering the URL of the website)
+The server will respond via TCP the HTML code that is rendered on our browser.
+
+UDP: connectionless protocol - this just means that not necessarily a connection has to be established
+before data packets are sent.
+So there could be some packet loss. Useful for videos because there is less overhead. So there will be
+more data sent per unit time compared to TCP assuming all else constant. But is less reliable.
+
+
+Internet Control Message Protocol (ICMP)
+Mainly used for debugging errors or status reporting.
+
+An ICMP request is sent in this case. Example: ping, ping reply.
+
+An ICMP message only has two possibilities: request or reply.
+
+Useful if you want to know if a packet has been successfully delivered or not.
+
+Under the umbrella of the two possibilities of request or reply; there are many categories:
+echo request: tests for reachability. Example is traceroute; which sends ICMP echo requests.
+timestamp request: requests for time on the remote device
+address mask request: request subnet mask of the remote device
+
+Types of reply
+echo reply: reply for the echo request
+destination unreachable: the packet cannot reach the remote device.
+redirect: this is when a router wants to inform a device that it should send its packet to
+another router
+time exceeded: packet took too long to reach destination
+parameter problem: this is when the packet's headers have issues.
+
+There is a header field that is useful: time-to-live. Explained in Linux Fundamentals, but idea:
+It decrements at each new device it hops to (and then back to our device) and then back to the
+next device by 1.
+
+Also useful is that different OS have different default TTLs. So we can use this to make a
+guess off the remote device's OS.
+
+
+
+Voice over IP (VoIP)
+Enables using internet to instead of traditional phone lines to make calls.
+VoIP ports conventionally are TCP/5060 and TCP/5061.
+These two ports are used for initiation, called Session Initiation Protocol (SIP)
+Another protocol called the H.323 protocol uses a different port - TCP/1720.
+But as of now SIP is still more popular.
+
+Common SIP requests and methods:
+1. INVITE: initiates a session or invites another endpoint to join call.
+2. ACK: confirms the recipient of 1.
+3. BYE: ends the session
+4. CANCEL: cancels a pending INVITE
+5. REGISTER: registers a SIP user agent with a SIP registrar server.
+    This server can belong to a company.
+    Having this SIP registrar server promotes security (authentication and authorisation)
+    and efficiency (due to faster mapping and connecting of user addresses) capabilities.
+6. OPTIONS: queries an SIP registrar server to about the status of the SIP registrar server.
+    This can also be used to request for information of another user registered in the server.
+
+Based on the notes, a SEPxxxx.cnf file, where xxxx is a unique identifier, is a configuration
+file used by Cisco Unified Communications Manager, formerly known as Cisco CallManager discovered
+which provided many details like the phone model, firmware version and other details.
+
