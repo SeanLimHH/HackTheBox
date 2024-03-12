@@ -558,3 +558,140 @@ Based on the notes, a SEPxxxx.cnf file, where xxxx is a unique identifier, is a 
 file used by Cisco Unified Communications Manager, formerly known as Cisco CallManager discovered
 which provided many details like the phone model, firmware version and other details.
 
+
+
+
+
+
+Wireless Networks
+
+These are computer networks that use Radio Frequency (RF) to send data.
+A WiFi adapter converts data into RF signals, then sends them over the air.
+
+Then, other devices will receive this signals and do conversions on their own.
+A local area network (LAN) that covers a small area like a home or a small office might
+use a technology called WiFi. WiFi generally has limited range.
+
+On the other hand, larger areas might use a Wireless Wide Area Network (WWAN).
+These are the 2G, 3G 4G LTE and 5G that we see on our phones - they use cellular networks
+to communicate over large distances.
+
+For WiFi networks, there are bands - 2.4GHz or 5 GHz bands.
+2.4GHz => Longer wavelength and can penetrate solid objects better than 5GHz.
+5 GHz => Shorter wavelength, less penetration power.
+
+Accessing a WiFi network. This is done via the Wireless Access Point (WAP). In homes, this
+could be a router.
+
+To connect to a router: one uses a wireless networking protocol: IEEE 802.11.
+When a device wishes to connect to a WiFi network, it sends a request to WAP to initiate
+the connection process. Such a request is called the connection request frame. It has the
+following details:
+
+1. MAC address
+2. SSID (this is the network name; Service Set ID)
+3. Supported data rates of device (this is the speed of data transfer supported)
+4. Supported channels of device (2.4GHz or 5 GHz)
+5. Supported security protocols of device
+
+
+WEP is an old security protocol to secure wireless networks. Called Wired Equivalent Privacy
+WEP Challenge Response Handshake
+This occurs if a device attempts to establish a secure connection with a WAP using a WEP
+security protocol.
+Packets are exchanged to establish connection.
+
+CRC checksum
+Occurs in WEP.
+This is to ensure that data is not modified. But it has a security risk:
+CRC value is derived from the plaintext data and not the encrypted data.
+This is why WEP is not recommended nowadays.
+
+WiFi networks have their own set of security features:
+1. Encryption
+    Above is one - WEP. There are also WPA2, WPA3
+2. Access Control
+3. Firewall
+
+More on WPA encryption:
+WPA can use different encryption algorithms.
+
+For WEP, there is an Initialisation Vector (IV) but is quite small and can be brute-forced
+
+
+
+Authentication Protocols
+Lightweight Extensible Authentication Protocol (LEAP) and 
+Protected Extensible Authentication Protocol (PEAP).
+Both, like the name suggests, are based on the EAP. This is a framework in networking.
+LEAP uses a shared key for authentication; same key is used for encryption and authentication.
+This, as you can see, has its dangers.
+
+PEAP, on the other hand, uses a more secure authentication method called the Transport Layer
+Security (TLS). Establishment of connection is done using a digital certificate and an
+encrypted tunnel that protects the authentication process.
+
+
+There is a protocol on network devices like routers and switches - TACACS+
+Stands for Terminal Access Controller Access-Control System Plus.
+The request typically includes the user's credentials and other information about the session.
+This authentication request is encrypted as well, using methods like SSL / TLS or IPSec.
+
+Disassociation attack
+It can be done on all networks. Such an attack's purpose is simply to disconnect one or more of
+the clients in a network. This is done by sending a disassociation frame to the clients.
+This plays with the idea that WAP uses disassociation frames to disconnect a client from the network.
+
+
+Wireless Hardening
+There are many ways to protect wireless networks. However, some are more useful than others:
+1. Disable broadcasting of SSID
+    Makes it harder to discover the network. WiFi will not be visible to unconnected devices.
+2. WiFi Protected Access (WPA)
+    There are two versions - WPA-Personal and WPA-Enterprise
+    The enterprise version uses a centralised authentication server to verify identity of clients.
+3. MAC filtering
+    Security measure that allows a WPA to accept or reject connections from specific devices from
+    their MAC addresses.
+4. Deploy EAP-TLS
+    Basically using EAP-TLS - it will provide stronger authentication and encryption.
+
+
+Virtual Private Networks
+The admin configures who can access the VPN; connects it to the internet; then authenticates
+themselves.
+VPNs can be used to enable employees to access the internal network of the company's servers remotely.
+There are required parts for a VPN:
+1. VPN client
+2. VPN server
+3. Encryption
+4. Authentication
+
+At the TCP/IP layer - VPN connection typically uses the Encapsulating Security Payload (ESP) protocol
+to encrypt and authenticate the VPN traffic. Then, the VPN client and server can communicate safely.
+
+
+Internet Protocol Security (IPSec)
+This is a network security protocol that also provides encryption and authentication.
+Works by encrypting the data payload of each IP packet + add an authentication header that verifies
+the integrity and authenticity of the packet.
+
+There are two modes of using IPSec:
+1. Transport Mode
+IPSec will only encrypt and authenticate the data payloads; no encryption of the packet's header.
+2. Tunnel Mode
+IPSec will encrypt and authenticate the entire IP packet and its headers. Typically used to create a VPN
+tunnel between two networks.
+
+In the case of implementing a firewall, a firewall in between the internal and external network has to
+allow the ESP protocol for encryption and authentication of IP packets.
+
+
+Point-to-Point Tunneling Protocol (PPTP)
+Another protocol that enables creation of VPNs.
+Works by establishing a secure tunnel between the VPN client and server. Then allow data to be transmitted
+securely through the tunnel. 
+It has many known vulnerabilities and hence has been discontinued
+
+Encapsulation here means wrapping data with protocol information as it moves through different layers of
+the network stack.
