@@ -695,3 +695,48 @@ It has many known vulnerabilities and hence has been discontinued
 
 Encapsulation here means wrapping data with protocol information as it moves through different layers of
 the network stack.
+
+
+
+Vendor Specific Information
+Cisco has its own operating system for their network devices like routers and switches called Cisco IOS.
+It has the typical set of features one would expect - security, virtualisation
+
+Can be managed via CLI and GUI.
+
+
+
+Virtual Local Area Networks (VLANs)
+This is a logical grouping of network endpoints.
+Broadcasts within one VLAN will not reach any other endpoints outside it.
+
+The idea is that each VLAN has its own subnet.
+
+The purpose of using one - if you only have one switch and or router. But you have different departments
+in a company. Then, an insider can actually perform attacks like broadcast storms. So having VLAN reduces
+the possibility of such an attack.
+
+
+
+Key Exchange Mechanisms
+
+A common protocol is the Diffie-Hellman key exchange
+Basis for TLS.
+Concept: two parties generate a shared secret key that is used to encrypt and decrypt messages between them.
+It is vulnerable to Man-in-the-Middle (MitM) attacks
+It also requires a lot of CPU power
+
+Another common protocol is RSA.
+This uses the idea that it is fast to multiply two large prime numbers but difficult to factor them into its
+prime.
+
+
+ECDH is a variant of Diffie-Hellman, but the shared key is generated using an elliptic curve.
+
+
+
+Authentication Protocols
+This protocol exists to verify identities of users and or devices.
+
+Also provides a means of securely exchanging information between entities in a network.
+
