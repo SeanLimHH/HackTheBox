@@ -1,0 +1,102 @@
+Key ideas that will be explored in this module:
+
+1. Attacks on the Link Layer
+2. Attacks on the IP Layer
+3. Attacks on the Transport Layer
+4. Attacks on the Network Layer
+
+Goal is detection in this module.
+
+Some topics covered here will be logs analysis, Indicators of Compromise (IoCs).
+
+
+
+ARP
+We will study ARP first as the notes point out that many attackers typically
+launch many attacks from ARP.
+
+It is the first protocol that should be scrutinised also because the attacks here
+are harder to detect due to untargeted nature of it. So it does not aim a target,
+but more of a broadcast. Hence it is harder to identify.
+
+Steps: Host A needs to send data to Host B
+(From Host A's perspective)
+1. Figure out Host B's physical address (MAC)
+2. Lookup the ARP cache. This consists a list of known addresses.
+Reason for lookup is to see if B's MAC address exists there. If so, no need to do
+the following steps. It will simply jump to step 5.
+3. (Not in ARP cache): Host A broadcasts an ARP request to all machines in the subnet.
+3a. B will pick out this request; as its physical address is in the ARP request itself.
+3b. B will then respond to this request; it sends back to host A with an ARP reply.
+3c. The ARP reply will contain the mapping; of host B's IP address and MAC address.
+4. The ARP reply is sent from host B to host A.
+5. Host A updates his own ARP cache with the details of the mapping received.
+
+
+ARP spoofing or ARP poisoning
+From the above's process, we can clearly see that it is possible for an attacker to act
+as a host B and reply to host A.
+
+Solutions
+1. Use predefined mappings
+    Manually configure the ARP mappings. So you can have no need to consult the ARP table.
+    This means preventing automatic changes. Make changes only possible via manual changes
+
+2. Restrict access to switches and routers via port security
+    Restrict the access of ports in the switches and routers. Only ensure that admins can
+    access it.
+
+
+
+tcpdump
+This is a tool to capture all packets and traffic.
+
+Basic usage: Capturing all packets live. eth0 is NIC
+'sudo tcpdump -i eth0 -w outputFileOfCapture.pcapng'
+
+To specifically capture only ARP:
+'sudo tcpdump -i eth0 -w outputFileOfCapture.pcapng arp'
+
+
+
+Opening .pcapng files
+Use Wireshark
+
+In this notes, i am provided a sample ARP spoofing .pcapng file
+
+If you observe many requests or replies being sent from a device
+within a short time frame, the device is suspicious.
+
+opcode functionality in Wireshark enables filtering:
+1. arp.opcode == 1 represents all types of ARP requests
+2. arp.opcode == 2 represents all types of ARP replies
+
+As we proceed to click on an entry:
+We see for a subsequent reply-request in the example, a yellow information box:
+Duplicate IP address detected for 192.168.10.4 (50:eb:f6:ec:0e:7f) - also in use by 08:00:27:53:0c:ba (frame 25)
+This message suggests that an IP address is mapped to two different MAC addresses.
+Wireshark figures this out by comparing the source and destination host IP and MAC
+addresses.
+
+To filter out duplicate records: use filter
+arp.duplicate-address-detected && arp.opcode == 2
+
+Solution to this: how to figure out?
+Determine the discrepancy devices' initial (first) IP address.
+Because devices can change their MAC address.
+
+Using a wireshark filter: (arp.opcode) && ((eth.src == <MAC address>) || (eth.dst == <MAC address>)).
+Then, observe the first entry of the broadcast.
+Under ARP (request), we can see the fields Sender MAC address and Sender IP address.
+We have to use these two fields, interpret them. This is done by realising that these two are mapped initially.
+
+Next, we have two other fields in it: target IP address and target MAC address.
+So mentally we have this MAC address mapped to this IP address.
+Then, the target MAC address is localhost (00:00:00_00:00:00)
+and the new target IP is something else.
+This is a clear sign that the attacker changed his own IP address to a new one.
+
+
+Another indicator: consistently dropping TCP connections
+This suggests that the attacker is not forwarding traffic to the router.
+In Wireshark, this is shown as: [TCP Retransmission]
