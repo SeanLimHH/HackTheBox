@@ -100,3 +100,103 @@ This is a clear sign that the attacker changed his own IP address to a new one.
 Another indicator: consistently dropping TCP connections
 This suggests that the attacker is not forwarding traffic to the router.
 In Wireshark, this is shown as: [TCP Retransmission]
+
+
+
+ARP scanning and Denial-of-Service
+IoCs of ARP scanning:
+1. Requests sent to sequential IP addresses
+2. Requests sent to non-existent hosts
+3. A sudden unusual volume of ARP traffic 
+
+Here, an example file provided showcased in the info section in wireshark - increasing number
+for the IP address.
+
+In fact, nmap will perform such sequential scans.
+
+What is the goal of ARP scanning?
+An attacker may do this to get a list of live hosts.
+Then, he may alter his strategy to deny service to all these live hosts.
+Or, the attacker can try to poison everyone's ARP cache.
+This is a strategy for a MitM attack.
+
+Some possible follow-ups to such actions:
+1. Tracing and identification. Locate and stop the activities of the malicious host.
+2. Containment: It may also be wise to disconnect or isolate the area at the switch or router level.
+
+
+
+
+802.11 Denial of Service
+A link-layer attack that is prominent is one aimed at 802.11 which is the WiFi.
+
+To examine the WiFi traffic, we would need a WIDS or WIPS system or a wireless interface capable of
+monitor mode. Monitor mode allows viewing of raw 802.11 frames and other packet types that might
+otherwise remain hidden.
+
+To view information of our wireless network interfaces in Linux: iwconfig
+
+Few methods to enable monitor mode:
+
+1. aircrack-ng
+The `airmon-ng` command is used to set a wireless interface (e.g., wlan0) into monitor mode.
+
+2. system utilities
+Call in sequence (bring down the wireless card => make it monitor mode => bring it back up):
+
+sudo ifconfig wlan0 down
+sudo iwconfig wlan0 mode monitor
+sudo ifconfig wlan0 up
+
+You can then verify whether the network interface is indeed in monitor mode using `iwconfig`
+
+To commence capturing - use aircrack-ng:
+You need 3 parameters:
+1. -c
+This is the Access Point's channel you want to monitor
+
+An access point (AP) channel refers to a specific radio frequency on which the wireless
+network operates.
+
+In Wi-Fi networks, APs can broadcast their signals over multiple channels within the 2.4 GHz
+or 5 GHz frequency bands.
+
+2. --bssid
+This is a unique identifier assigned to each AP or wireless router.
+
+3. -w <outputFileName>
+This is to write the results to an output file.
+
+
+Deauthentication Attacks / Dissociation attack
+Idea:
+The attacker sends deauthentication frames to one or more clients.
+These deauthentication frames basically will disconnect the clients from the network.
+These deauthentication frames appear to originate from the legitimate access point.
+
+Then, when the client attempts to reconnect: the attack shall sniff the packets and crack it offline.
+
+How it is performed:
+Spoof the MAC address of the sender.
+
+To prevent:
+Have control tools like IEEE 802.11w (Management Frame Protection)
+
+Detection of potential deauthentication attacks
+In the notes we are provided a sample packet.
+To limit view to only from AP's BSSID: use `wlan.bssid == xx:xx:xx:xx:xx:xx`
+
+To view deauthentication frames from our BSSID or an attacker pretending to send these from our BSSID:
+(wlan.bssid == xx:xx:xx:xx:xx:xx) and (wlan.fc.type == 00) and (wlan.fc.type_subtype == 12)
+fc.type represents the frame management type == 0; and fc.type_subtype represents the subtype.
+For deauthentication, the subtype is 12.
+
+One IoC is massive amount of deauthentication frames sent to one client. (sign of DoS attack)
+Another IoC is that in each of the frame, we see the same reason code.
+
+A sophisticated attacker will change the reason code as he attacks.
+
+Some measures to take are:
+1. Enable IEEE 802.11w (Management Frame Protection) if possible
+2. Utilise WPA3-SAE
+3. Modify WIPS / WIDS detection rules.
