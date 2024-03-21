@@ -1,0 +1,349 @@
+https://www.youtube.com/watch?v=zJ6WbK9zFpI
+
+###### What is Docker and how it works
+https://www.youtube.com/watch?v=aLipr7tTuA4
+Fundamentally, in essence. It separates applications from infrastructure using container technology. 
+Similar to how virtual machines separate OS from the bare metal hardware.
+###### Core components of Docker
+- Docker daemon. This runs on the host machine continuously
+- Docker client. This is a CLI to interact with the daemon
+
+###### Workflow components of Docker
+- Docker image. This holds the environment and your application
+- Docker container. This is created from a docker image above
+- Docker registry. These are repositories to store docker images
+- Dockerfile. This automates image construction
+
+###### Iterative Workflow of Docker
+Now, one interesting thing you can do is that you can iteratively update your image with new instructions.
+You can put commands to even perform the typical tasks that you do. For example: an example workflow process:
+1. You pull an image from Docker Hub.
+2. Docker run to get a container
+3. Inside the container we will install our software, our stack, our applications and whatever we need to
+4. Commit the container to a private or public Docker registry. Remember like GitHub, this is tracked. 
+So you will create one new layer. You will create a new image.
+5. If you are comfortable with version 1, you can push it back up to a public repository for others to do the same.
+- Now if you are ready for version two, you will do essentially the same thing: Repeat the above steps from 1. to 5.
+
+###### Kubernetes
+Read the above iterative workflow.
+Kubernetes is developed by Google to automate a lot of the above's workflow. Kubernetes seats on containers. 
+It is like a set of instructions to build a set of instructions essentially, but even more simplified.
+
+###### High-level overview of why you need Docker
+When you have different technology stacks:
+First of all, one has to ensure that each of the services are compatible with the OS.
+There are times where the version is not compatible with the OS.
+
+The architecture of your application can change over time. And every time you change, you will have to check compatibility again and again...
+
+Next, if you have a new developer on-board, it is difficult to set up his environment -
+you must ensure that all the versions of services and applications are synchronised.
+
+Then, consider, if a developer takes a long time to develop a feature, then the versions will be desynchronised.
+
+With docker, the above becomes running in parallel containers:
+
+Each container has its own isolated libraries and dependencies
+Underlying each container is Docker, then the OS.
+
+###### What is a container
+A container is a completely isolated environment; it can have its own processes.
+The only thing is that all containers share the same OS kernel.
+
+
+###### Docker and OS
+Docker can run any flavour of OS as long as it is the same kernel. Think of Linux - you have many distributions. 
+Docker can run multiple distributions simultaneously over the underlying Linux OS: it can run Ubuntu, Debian, Fedora, CentOS simultaneously.
+
+Each Docker container only has an additional software that differentiates the OS system. 
+And Docker utilises the underlying kernel of the docker host.
+
+For example, Windows does not share its OS. So you cannot run a Windows-based container on a Docker host with Linux on it. 
+For Windows, you will require Docker on a Windows server.
+
+When you install Docker on Windows and run Linux container on Windows, you are not really running a Linux container on Windows. 
+Windows runs a Linux container on a Linux virtual machine under the hood.
+
+###### Main Purpose of Docker
+It is not virtualisation. The main goal is to to package and containerise applications and to ship them and to run them anywhere anytime as many times as you want.
+
+###### Containers vs Virtual Machines
+Containers build on top of Docker on top of OS on top of hardware
+Virtual Machines build on top of hypervisors built on top of hardware
+Each virtual machine has its own OS inside it.
+
+There is much more utilisation of CPU in the virtual machine case, for you have multiple OS and kernels running.
+Also, each VM is heavy and gigabytes in size. So will consume more space.
+Docker containers are usually in megabytes. Hence it boots up in seconds.
+Docker containers however, have less isolation since it shares the kernel.
+
+
+###### Docker Hub
+Most of the time, we can combine both virtual machines and containers: provision containers within virtual machines within a single machine.
+
+Most companies have their products containerised and available in a public dock or repository called [[Docker Hub]] or [[Docker Store]].
+For example, you can find common OS, databases and other services and tools. 
+Docker Hub is very much like GitHub is for source code, but for docker images instead.
+
+Once you have identified and download what you want, it is very easy to start it up: just run the command `docker run <nameOfImage>`
+If you need to run multiple containers; stack the command: example:
+```
+docker run mongodb
+docker run ansible
+docker run redis
+docker run nodejs
+docker run nodejs
+```
+Notice that you can run multiple instances of the same service as required.
+
+###### Image vs Container
+An image is a package or a template. It is used to create one or more containers.
+
+Containers are just running instances of images that are isolated and have their own environments and processes.
+
+You can create your own image.
+
+###### Docker in DevOps
+Traditionally, developers developed applications, then they hand it to ops team to deploy and manage it in production environments.
+Developers will provide a set of instructions in this process on how to set up the host, what prerequisites are to be installed in the host and much more.
+Since the ops team did not really develop the application, they may not know what is going on.
+
+This set of instructions is formalised as a Dockerfile. It details the information required by ops team and required by the developers.
+
+This dockerfile is then used to create an image for their application.
+
+This image can now be run on any host with Docker installed on it, and guaranteed to run it the same way, anywhere.
+So the ops team can simply use the image to deploy the application since the image was already working when the development team built it.
+
+This is just one example that Docker contributes to DevOps
+
+###### Options available for Docker on Windows - Running Linux applications
+1. Docker Toolbox
+	- This was the original support for Docker on Windows
+	- If you had no access to Linux systems. In this case, use a virtual machine. Then download Docker on it and play around with it.
+	- This is quite limited - you are working with Docker on a Linux machine on a Windows host.
+2. Docker Desktop
+	- In contrast to the above's Docker Toolbox, we take out the virtual machine and use Windows' native virtualisation technology called Hyper-V
+	- During installation, it still creates a Linux system underneath, but this time, it does not sit on top of a VM; it sits on top of Hyper-V.
+	- Because of Hyper-V requirement, only certain flavours of Windows support this - Windows 10 Enterprise or Professional, as they have Hyper-V support.
+	So you must see whether your Windows flavour supports this Hyper-V technology
+
+The above are for running Linux applications.
+With Windows Server 2016, Windows announced support for containerisation for Windows for the first time.
+
+This is why, when you install Docker Desktop for Windows, you by default is to work with Linux containers.
+But if you would like Windows containers, you explicitly need to configure it.
+
+###### Windows Containers
+Concept is similar to Linux containers.
+
+To allow better security boundaries, Windows introduced a second option: Hyper-V isolation:
+each container is run within a highly-optimised virtual machine guaranteeing complete kernel isolation between containers and 
+underlying host.
+
+###### Windows Base Images:
+1. Windows Server Core
+	- Not as lightweight as you think
+2. Nano Server
+	- This runs at a fraction of size of the full OS.
+
+
+
+A simple Dockerfile for a Node.js application might look like this:
+
+```Dockerfile
+FROM node:latest
+WORKDIR /app
+COPY . .
+RUN npm install
+EXPOSE 3000
+CMD ["node", "app.js"]
+```
+
+This Dockerfile tells Docker to start with the latest Node.js image, set the working directory to `/app`, copy the application
+files into the container, install dependencies, expose port 3000, and start the Node.js application when the container starts.
+
+Then, you will have to build an image via this Dockerfile: cd to the project's root directory.
+Then run the command `docker build -t <image name> .`
+`-t` will tag your image name.
+
+Next, in Docker Desktop. This should automatically pop up in this client in the Images tab;
+regardless of where your project is located, assuming you followed the steps above and called `docker build -t <image name> .`
+
+So you should be able to view the created image in Docker Desktop.
+1. Click on the image. 
+2. Click Run. 
+3. Under Optional settings, you can specify port number
+
+That is all. You have a running container from an image you built from a Dockerfile.
+
+
+###### Docker commands
+```
+docker run <image name>
+This starts an instance (container) in the foreground. Requires a Dockerfile.
+Note that this is in attached mode; the console only shows the output. You cannot input into the console. If you want to input into the console, do docker run -d <image name>
+
+docker run -d <image name>
+This runs a container in the background. Requires a Dockerfile
+This enables you to input into the terminal console since the container is running in the background
+
+docker ps
+Lists all running containers.
+
+docker ps -a
+Lists all containers running or not
+
+docker stop <docker container name or docker container id>
+Stops a container
+
+docker rm <docker container name or docker container id>
+Removes a container
+
+docker images
+List all images present on our host
+
+docker images -q
+List all images present on our host in their id form.
+
+docker rmi <docker image name>
+Remove image
+
+docker pull <image name>
+Download image and installs on host
+
+docker run ubuntu sleep 7
+This is a showcase of how you can chain commands; the sleep command for 7 seconds.
+
+docker exec <container name> <command>
+This is to execute a command on a container. Example:
+docker exec distracted_mcclintock cat /etc/hosts
+This prints the content of /etc/hosts.
+
+docker ps -a -q
+List all containers. -q means only short numeric IDs.
+We use this command to chain with stopping all containers and or removing them and or starting them. See next command.
+
+docker stop $(docker ps -a -q)
+Stops all containers.
+
+docker rm $(docker ps -a -q)
+Removes all containers.
+
+docker rmi -f $(docker images -q)
+Forcefully removes all docker images.
+
+docker run --name webapp nginx:1.14-alpine
+Runs a container with the nginx:1.14-alpine image and name it webapp
+
+docker inspect <container id or name>
+Displays a lot of information regarding the container. Also shows environment variables of container.
+
+docker logs <container id or container name>
+This is to view all the logs related to the container.
+
+docker run -e <environment variable name>= <environment variable value>
+This passes the environment variable and its value into a container.
+```
+
+###### Important Caveats
+Containers are just meant to run processes or do some task. It should live as long as the task is alive, not entire OS.
+
+This explains why when you do `docker run ubuntu`, it will stop immediately.
+This is because it has no running process or application, it serves as a base for other applications.
+
+`docker run <image name>`
+When you run an image, it runs in the foreground, or in attached mode.
+This means that you are attached to the console or standard output of the docker container. You will only be able to see and view the output in the console, but cannot input into it.
+
+Now, you can circumvent this by doing `docker run -d <image name>`, which is detached mode.
+
+Also, it is possible to run single liners as containers. But this might be not very efficient since there is still some overhead albeit small
+
+###### Tags
+Each software can have its own tag, which is basically a custom name.
+
+###### IP address and port mapping
+Every container has its own IP address by default.
+However, it is an internal IP. It is only accessible from within the docker host, but not outside.
+
+To allow people from outside to access it, you would use the Docker Host IP that hosts all the containers.
+
+But for that to work, you must have mapped a port in the container to a free port on the Docker Host.
+
+For example: you have a container with internal IP with port 5000.
+
+You want external people to be able to access the container and let us say through port 80 of the Docker Host.
+So now, you have to map port 5000 to port 80.
+
+You do this via `docker run -p 80:5000 <image name>`
+Now, implicitly, you can see that it is possible to run the same image, and spin multiple same images and instances.
+
+###### Persistency
+Consider MySQL database.
+```
+docker run mysql
+docker stop mysql
+docker rm mysql
+docker run -v /opt/datadir:/var/lib/mysql mysql
+```
+Observe the mapping of the local directory /opt/datadir to the instance data directory /var/lib/mysql
+
+This way, when docker container runs, it will implicitly mount the external directory to a folder inside the docker container.
+So now all your data will be stored in /opt/datadir.
+
+###### Tips to containerise an application (how to create an image)
+1. Understand the OS required (Example : Ubuntu)
+2. Update apt repo
+3. Install dependencies using apt
+4. Install Python dependencies using pip
+5. Copy source code to /opt folder
+6. Run web server using flask command
+Example:
+###### Elements of a Dockerfile
+The syntax is 
+`<instruction> <argument>`
+We typically then start off with an OS or another image.
+All Dockerfile start with `FROM <OS>` command
+Then you will install all dependencies
+Then you will copy the source code to /opt folder
+- The `/opt` directory is designated for optional software packages that are not part of the operating system's standard installation.
+This directory provides a centralised location for installing and managing third-party applications separately from system-provided software
+Finally specify the entry point
+- This allows us to specify a command when the image is run as a container.
+
+Note that the structure of how it runs the instructions are in order. This is known as a layered architecture of Docker
+
+If an instruction fails, you can thus easily backtrack and or figure out which instruction failed.
+###### Usage cases
+You can containerise literally anything
+
+###### CMD instruction
+- The `CMD` instruction sets the default command and/or parameters to be executed when a container starts. 
+- It defines which program or executable should run within the container when it starts up.
+Example: `CMD ["executable", "arg1", "arg2"]`
+The idea is that the first element is an executable and subsequent arguments are arguments to the executable.
+###### ENTRYPOINT instruction
+An `ENTRYPOINT` is an instruction in a Dockerfile that specifies the default executable or command that should be run when a container is started.
+
+
+###### Docker Engine
+Consists of 3 components:
+1. Docker CLI
+	- Just a CLI as discussed above
+	- Used to interact with the REST API
+	- This CLI can be on a separate computer or host and it can still interact with the same REST API:
+		`docker -H=remote-docker-engine:2375`
+		Example: `docker -H=10.123.2.1:2375 run nginx`
+2. REST API
+2. Docker Daemon
+###### Containerisation under the hood
+Docker uses namespaces to isolate workspace.
+
+Namespaces allow Docker to create separate instances of various system resources for each container.
+This provides isolation and ensuring that processes running within a container are unaware of processes and
+resources outside of their namespace.
+
+Understand that the main system will showcase all the child processes as well.
+
