@@ -200,3 +200,106 @@ Some measures to take are:
 1. Enable IEEE 802.11w (Management Frame Protection) if possible
 2. Utilise WPA3-SAE
 3. Modify WIPS / WIDS detection rules.
+
+
+
+
+Rogue Access Point and Evil Twin
+
+Rogue Access Point is an access point illegally set up to bait people to connect to it (Wi-Fi), then
+steal data from users.
+
+An example could be someone setting up a personal wireless router in a company's cubicle
+This creates a possible rogue access point where hackers can exploit to gain access to the network
+
+
+Evil Twin is a copy of the actual wireless access point with spoofed mimicked SSID.
+Intention is to trick people into connecting to it instead of the actual access point
+
+Filter in wireshark that we could use: (wlan.fc.type == 00) and (wlan.fc.type_subtype == 8)
+
+Beacon frames
+This are frames (type of packets) that is periodically emitted by Wireless Access Points to announce
+its existence.
+The filter above filters out beacon frames of the sort:
+https://semfionetworks.com/wp-content/uploads/2021/04/wireshark_802.11_filters_-_reference_sheet.pdf
+
+Beacon analysis is useful in determining actual and fake access points.
+
+A clear indicator: RSN is a type of security protocol used in Wi-Fi networks.
+We can see if the network we connect to lack this; it could be a telltale sign of an evil twin.
+Under tagged parameters in Wireshark, we observe Robust Security Network (RSN)
+
+If such a situation occurs; by inspecting the identity of the device: we can apply a filter to observe
+all victims: wlan.bssid == <MAC of device>
+
+
+
+Fragmentation Attacks
+
+This refers to exploitation of vulnerabilities of the way fragmented packets are handled by network devices.
+Here, the focus is on IP layer.
+The IP layer does not have mechanisms to detect packet loss, drops or tampering.
+
+This is the reason why attackers tend to prey on this layer; malforming packets.
+
+Concept of fragmentation and its abuse
+Its purpose is to split large data sizes into smaller packets to be sent over the web.
+The packets are then reassembled upon delivery.
+
+MTU is used to determine the maximum payload size for a single packet.
+Different protocols may have different MTUs. 
+
+Some common strategies of attackers:
+1. Fragmentation of scanning techniques.
+If the IDS or IPS does not simulate reassembly of packets to detect the purpose of the packet, an attacker
+can perform scans in fragments, hence possibly bypassing firewall controls.
+This method can bypass a poorly configured firewall as well.
+
+2. Flooding with very small MTU
+This can tax system resources where the attacker hopes that the network does not reassemble the packets
+
+3. Denial of Service with very large MTU (exceeding 65535 bytes)
+65535 bytes is the max size of an IP packet including its headers.
+
+A strategy to prevent the above:
+1. Complete the reassembly of packets and inspecting it before proceeding.
+
+
+Display of enumeration of nmap: From defender's POV.
+1	0.000000	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=1/256, ttl=64 (reply in 2)
+2	0.000248	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=1/256, ttl=64 (request in 1)
+3	1.028667	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=2/512, ttl=64 (reply in 4)
+4	1.028890	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=2/512, ttl=64 (request in 3)
+5	2.040772	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=3/768, ttl=64 (reply in 6)
+6	2.041033	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=3/768, ttl=64 (request in 5)
+7	3.068466	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=4/1024, ttl=64 (reply in 8)
+8	3.068835	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=4/1024, ttl=64 (request in 7)
+9	4.093264	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=5/1280, ttl=64 (reply in 10)
+10	4.093507	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=5/1280, ttl=64 (request in 9)
+11	5.114179	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=6/1536, ttl=64 (reply in 12)
+12	5.114402	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=6/1536, ttl=64 (request in 11)
+13	6.143716	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=7/1792, ttl=64 (reply in 14)
+14	6.144008	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=7/1792, ttl=64 (request in 13)
+15	7.165677	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=8/2048, ttl=64 (reply in 16)
+16	7.165943	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=8/2048, ttl=64 (request in 15)
+17	8.196883	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=9/2304, ttl=64 (reply in 18)
+18	8.197163	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=9/2304, ttl=64 (request in 17)
+19	9.208388	192.168.10.5	192.168.10.1	ICMP	98	Echo (ping) request  id=0xa07b, seq=10/2560, ttl=64 (reply in 20)
+20	9.208615	192.168.10.1	192.168.10.5	ICMP	98	Echo (ping) reply    id=0xa07b, seq=10/2560, ttl=64 (request in 19)
+
+An attacker may fragment: nmap -f 10 <defender's IP>: defender's POV:
+23	23.527435	192.168.10.5	0.0.0.10	ICMP	60	Echo (ping) request  id=0xc6bb, seq=0/0, ttl=58 (no response found!)
+24	23.527467	192.168.10.5	0.0.0.10	IPv4	60	Fragmented IP protocol (proto=TCP 6, off=0, ID=9cc1) [Reassembled in #26]
+25	23.527473	192.168.10.5	0.0.0.10	IPv4	60	Fragmented IP protocol (proto=TCP 6, off=8, ID=9cc1) [Reassembled in #26]
+26	23.527484	192.168.10.5	0.0.0.10	TCP	60	47494 → 443 [SYN] Seq=0 Win=1024 Len=0 MSS=1460
+27	23.527498	192.168.10.5	0.0.0.10	IPv4	60	Fragmented IP protocol (proto=TCP 6, off=0, ID=19b5) [Reassembled in #29]
+28	23.527506	192.168.10.5	0.0.0.10	IPv4	60	Fragmented IP protocol (proto=TCP 6, off=8, ID=19b5) [Reassembled in #29]
+29	23.527510	192.168.10.5	0.0.0.10	TCP	60	47494 → 80 [ACK] Seq=1 Ack=1 Win=1024 Len=0
+
+We can observe the fragments above. The more fragments, the more suspicious.
+
+Some other indicators mentioned: many ports on the defender's machine are visited in a short span of time; and some of the ports
+being closed.
+
+To view packets with TCP RST flag set to 1: tcp.flags.reset==1
