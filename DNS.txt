@@ -1,0 +1,214 @@
+###### Motivation
+The machine that you want to connect to is 192.168.1.11
+You want to simplify and instead of `ping 192.168.1.11`, you want to `ping db`
+
+You have to tell the machine via `/etc/hosts`.
+
+Whatever you put in /etc/hosts, the mapping becomes the truth for the machine with it.
+
+Note that `ping/ssh/curl` all uses `/etc/hosts`
+
+This mapping is a process called name resolution.
+
+You can have $>1$ mapping.
+
+Imagine that you have many different mappings of the same IP address and then the IP address changes... problems will arise.
+
+Hence, the idea of DNS is introduced
+###### Basics
+The DNS manages the mappings. Now, it itself is a newly introduced server to the above's concept.
+
+After its existence, we point all hosts to the DNS servers.
+
+The DNS server's default IP address is 192.168.1.100. All hosts in the network have this entry: in /etc/resolv
+```/etc/resolv.conf
+nameserver      192.168.1.100
+```
+Now, changes to the host > we just have to update the DNS server and that is it.
+
+###### Custom resolving
+Note that you can still custom resolve the IP address and host name.
+
+###### What if your local /etc/hosts has same hostname as the DNS server but different IP address from it?
+1. Host looks at /etc/hosts. If the mapping is here, it uses it.
+2. If not found in /etc/hosts, then find in DNS.
+
+The order can be switched and changed. This is defined in the following file: /etc/nsswitch
+```/etc/nsswitch.conf
+hosts:          files dns
+```
+
+###### If not found in DNS? 
+Firstly, you can configure a new root DNS to query: add an entry: Google name server is hosted at `8.8.8.8`
+
+You can add this above line to /etc/resolv.conf:
+```/etc/resolv.conf
+nameserver      8.8.8.8
+```
+And now you will query the Google name server
+###### Layers of DNS 
+1. Your own computer
+2. DNS resolver server; your ISP
+3. Root server
+###### Root server
+Root servers sit at the top of the hierarchy; it receives requests from people like us; from your ISP.
+
+The key thing is, they do not know where the specific IP address is located at. But, it does know which domain to query.
+
+More specifically, it knows which Top Level Domain the IP address belongs to, but not the specific location. So it queries the corresponding Top Level Domain (TLD) name server for the IP address. The word query here can be misleading. What it means is that the root server is figuring out what is the address of the TLD name server, that is it.
+
+###### Root server and TLD
+The TLD name server will pass the root server its IP address (TLD name server). This IP address is forwarded via the root server to the DNS resolver; your ISP; then to you.
+
+###### Examples of TLD
+.com
+.net
+
+###### TLD
+Here, when you query the TLD for let us say `yahoo.com`, it actually does not know the IP address for `yahoo.com`. It will forward you to to the Authoritative Name Server
+Each organisation typically has its own Authoritative Name Server. Its purpose is to more specifically redirect the visitors to particular IP addresses of webpages.
+
+In the context of above, the authoritative name server of yahoo will have the IP address for `yahoo.com`. 
+
+Now, this is because that there could be more subdomains. Example would be like mail.google.com: google in this case has subdomain mail. In such scenario, you would find the use of an authoritative name server helpful: it can redirect you to specific web services' webpages via their IP addresses.
+
+###### How does the TLD know about a company's authoritative name server?
+When a domain is registered (e.g., `google.com`), the domain registrar (GoDaddy, Google Domains, Bluehost...) collects information about the authoritative name servers for that domain from the domain owner during the registration process.
+
+Some benefits that you should know: with large companies like Vercel operating their own Authoritative Name Server across the globe, searches to websites (custom domain names) that are under them will be very fast due to large distribution of their name servers. Which is better than your locally hosted server.
+
+
+###### Order of Domain Name
+You should interpret the websites in right-to-left order (RTL):
+www.yahoo.com.
+There is in fact a dot after .com. This . suggests the root domain.
+.com is the top level domain
+yahoo is the second level domain (colloquially known as just 'domain')
+www. is the subdomain
+
+###### DNS Records (of Authoritative Name Server)
+https://www.youtube.com/watch?v=HnUDtycXSNE
+There are many types of records; each type has its identifier and its mapping.
+
+| Record Type | Name        | IP Address   | TTL  |
+| ----------- | ----------- | ------------ | ---- |
+| A           | example.com | IPv4 address | 7200 |
+| AAAA        | example.com | IPv6 address | 7200 |
+
+| Record Type | Name              | Alias To    | TTL  |
+| ----------- | ----------------- | ----------- | ---- |
+| CNAME       | www. example. com | example.com | 7200 |
+For CNAME, consider a subdomain in the Name field (like `mail.example.com`.
+Then notice that the request still goes to the original `example.com` despite user keying in `mail.example.com`. It is just that it gets forwarded back to its actual subdomain `mail.example.com`. There is in fact a little bit of back-and-forth here.
+
+
+| Type | Priority | Name        | Host              | TTL  |
+| ---- | -------- | ----------- | ----------------- | ---- |
+| MX   | 10       | example.com | mail1.example.com | 7200 |
+| MX   | 20       | example.com | mail2.example.com | 7200 |
+Used for email.
+The MX record points to the server where email should be delivered to.
+
+For MX records, there is an agent that queries it called the Mail Transfer Agent (MTA). The MTA is typically your browser.
+
+Example:
+when you send email to `tom@example.com`, your MTA will query the MX records for example.com.
+
+The DNS will respond back telling the MTA which server to send the email to.
+
+TLDR: MX records just tells people which server to send email to for its said domain.
+
+MX records also reside in the Authoritative Name Server 
+
+###### Priority of MX
+The lower, the higher the priority. When one goes down, you can use the other one.
+
+###### Start Of Authority (SOA)
+This stores administrative information about a DNS zone. Resides in Authoritative Name Server
+
+A DNS zone is a section of a domain name space that a certain administrator has been delegated control over:
+Consider example.com broken down to 3 subdomains:
+1. shop.example.com
+2. blog.example.com
+3. support.example.com
+Then the head administrator can create DNS zone and delegate control over these subdomains to different administrators if he desires to.
+
+More concretely, consider the case where shop.example.com has 3 computers, blog.example.com has 2 computers and support.example.com has 5 computers.
+
+The head administrator can designate shop.example.com and blog.example.com to have one administrator to manage (DNS zone 1) and support.example.com another administrator to manage (DNS zone 2)
+
+The point is to have more manageability. And each DNS zone will have its own DNS zone file which contains its own SOA DNS record:
+
+| Type | Name            | RName             | Serial Number | Retry | TTL  |
+| ---- | --------------- | ----------------- | ------------- | ----- | ---- |
+| SOA  | ns1.example.com | admin.example.com | 510025        | 60    | 7200 |
+The name contains the primary name server.
+The RName is the email address of the admin in charge for the zone. The first `.` in `admin.example.com` represents a `@`
+The serial number is the version in the zone. When an update happens in the zone, the serial number will change. This informs secondary servers to update as well.
+
+The NS DNS record:
+
+| Type | Value           | Name        | TTL  |
+| ---- | --------------- | ----------- | ---- |
+| NS   | ns1.example.com | example.com | 7200 |
+The Name Server provides the name of the Authoritative Name Server within a domain.
+This record is stored in the Authoritative Name Server itself.
+
+SRV DNS record: service record
+
+| Type | Priority | Service             | Port | Name        | Weight | TTL  |
+| ---- | -------- | ------------------- | ---- | ----------- | ------ | ---- |
+| SRV  | 10       | service.example.com | 999  | example.com | 0      | 7200 |
+The service record points to a server and a service by including a port number.
+Use case: application needs to find the location of a service on a domain like VoIP, printer instant messaging, it queries this for a record. Then it will be directed to the correct server and port number.
+
+PTR DNS record: pointer record
+
+| Type | IP address  | Name        | TTL  |
+| ---- | ----------- | ----------- | ---- |
+| PTR  | 12.34.56.78 | example.com | 7200 |
+The pointer record is the reverse of a `A` or `AAAA` record. Resolves IP address to name.
+Purpose is to prevent email spam.
+Whenever an email is received, the email server uses the PTR record to determine if the sender is authentic:
+1. It looks at the IP address of the sender's email - example gmail.com, or yahoo.com.
+2. Find the corresponding name via the PTR record.
+3. Check if the names matches the IP address.
+This process is called a reverse DNS lookup.
+If there is a mismatch, the email will be flagged as spam.
+
+TXT DNS record: Text record
+
+| Type | Name        | Value                                   | TTL  |
+| ---- | ----------- | --------------------------------------- | ---- |
+| TXT  | example.com | This is a sample text about this domain | 7200 |
+It contains miscellaneous information about a domain.
+Also used to prevent email spam.
+Can contain any sort of text.
+###### Explanation of TTL 
+TTL: Time-To-Live, in seconds, before the record is cached. This record after the time will be cached and is considered stale. At the same time, the Authoritative Name Server will then query
+
+After the TTL (Time to Live) for a DNS record expires, the cached record becomes stale, indicating that it may no longer accurately reflect the current state of the DNS record maintained by the authoritative name server. At this point, DNS resolvers typically query the authoritative name server again to obtain the updated record and replace the stale record in their cache.
+
+###### What kind of names does it store? 
+It stores the pointers to subdomains within the same domain (infrastructure). So it is internal; not external.
+
+###### However, why store the record in the cache at all if it becomes stale after the TTL expires? 
+
+There are several reasons for this: Examples:
+
+1. Better than not having any records - providing cache records are better than nothing.
+2. Backup, in case of any failure or network disruptions.
+
+###### When would you ever have a small TTL?
+
+This is when you have load balancers or subdomains that you have to spin out temporarily.
+
+Also when testing DNS configurations or servers
+
+
+###### Practical Experiment on DNS
+https://www.youtube.com/watch?v=FsGUi5pXpLk
+
+https://unix.stackexchange.com/questions/28553/how-to-read-the-local-dns-cache-contents
+
+https://www.joshmcguigan.com/blog/run-your-own-dns-servers/
