@@ -303,3 +303,90 @@ Some other indicators mentioned: many ports on the defender's machine are visite
 being closed.
 
 To view packets with TCP RST flag set to 1: tcp.flags.reset==1
+
+
+
+
+IP Source and Destination Spoofing
+
+When observing IPv4 and IPv6 traffic, the source IP should always come from our subnet.
+
+Note that IP packets can be crafted; hence it is not so straightforward to immediately detect them.
+
+Some attacks:
+1. DDoS with changed source address
+2. Changed-source of packets (goal is to bypass firewalls)
+3. SMURF attacks
+4. LAND attacks
+
+SMURF attacks are done in the following way:
+
+1. The attacker will send an ICMP request to live hosts with a spoofed address of the victim host
+2. The live hosts will respond to the legitimate victim host with an ICMP reply
+3. This may cause resource exhaustion on the victim host
+
+An indicator is many ICMP requests. Sometimes attackers combine it with fragmentation
+
+LAND attacks are done with the idea to block all ports:
+
+1. Spoof the source and destination IP addresses to be the same
+2. If all ports are occupied, real connections are more difficult to establish with the affected host.
+
+
+
+IP Time-to-Live attacks
+This is not really an attack; more of a means of evading detection. Just as the packet is about to expire,
+the attacker catches the packet before it reaches the firewalls, IDS, IPS ...
+
+This is done by setting a very small TTL. So the packet expires fast
+
+One solution is to discard or filter out very small TTLs
+
+
+
+TCP handshake abnormalities
+For TCP connection:
+1. Client sends TCP SYN-flagged request.
+    Synchronised flag is set; desire to connect
+2. If port is open and connectable, other client sends back a TCP SYN-ACK-flagged reply.
+    Acknowledges and reserves some resources for the connection
+3. Then client sends a TCP ACK-flagged request to mark the start of connection
+    Is like a receipt. Completion of three-way handshake
+
+
+Some abnormalies:
+1. One host to many ports
+2. One host to many hosts
+3. Many and or unusual flags in packets
+4. No flags (NULL scan)
+
+For example: in an nmap scan, you will send a SYN-marked packet. For nmap scans, you will
+send many separate packets to many different ports.
+
+It will show up many [SYN] info in the packets in wireshark.
+Two primary scans that shows up SYN - SYN stealth scans and SYN scans
+
+For a NULL scan, the TCP connections behave as follows:
+1. If port is open: system does not respond - simply because there are no flags!
+2. If port is closed: system responds with an RST packet.
+
+Another example: Too many [ACK] scans
+
+In the case of an ACK scan TCP connections behave as follows:
+1. If a port is open: system does not respond OR responds with RST-flagged packet
+2. If a port is closed: system responds with an RST-flagged packet
+
+
+Another indicator: Too many [FIN] scans
+
+The TCP packets marked with FIN flag - marks termination of TCP connection.
+Such an attack is called a FIN flood attack. The idea is to flood the TCP/IP stack.
+
+In the case of a FIN scan, our machine will behave as follows:
+1. If a port is open: system does not respond
+2. If a port is closed: system responds with an RST-flagged packet 
+
+Lastly, another indicator is too many flags. This is known as an Xmas tree scan.
+Similarly, in the case of such a scan, our machine will behave as follows:
+1. If a port is open: system does not respond or with an RST-flagged packet
+2. If a port is closed: system responds with an RST-flagged packet 
