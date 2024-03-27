@@ -389,4 +389,46 @@ In the case of a FIN scan, our machine will behave as follows:
 Lastly, another indicator is too many flags. This is known as an Xmas tree scan.
 Similarly, in the case of such a scan, our machine will behave as follows:
 1. If a port is open: system does not respond or with an RST-flagged packet
-2. If a port is closed: system responds with an RST-flagged packet 
+2. If a port is closed: system responds with an RST-flagged packet.
+
+
+
+
+TCP Connection Resets and Hijacks
+
+Notice that connections can be terminated as discussed above by an attacker.
+It can also be hijacked.
+
+A TCP connection termination attack is known as a TCP RST packet injection attack.
+
+Such an attack is conducted in this manner:
+1. Change the attacker's own packet's source IP address to the victim's IP address.
+2. Change TCP packet to contain RST flagged set to true.
+3. Include valid sequence numbers in the forged packets.
+Sequence numbers ensure proper sequencing of TCP segments.
+4. Change the destination address and port to the desired target machine hosting the service.
+The port should be chosen to hold services that the attacker wishes to deny from the victim
+5. The target machine holding the service that we wish to deny from a victim machine will interpret
+it as a disconnection, hence terminating the connection.
+Examples: Port 80 for HTTP, port 443 for HTTPS, port 21 for FTP
+
+From a defender's standpoint, if you see a lot of packets sent to one port, it is suspicious.
+
+
+
+
+TCP Connection Hijacking
+The idea here is that the attacker actively monitors the target connection that they wish to hijack.
+
+Then the attack predicts the sequence numbers, and performs the same steps as the above, spoofing the
+source IP address to the victim's.
+Once a 3-way handshake reaches the 2nd way, the attacker acts as the victim, sending the last ACK packet
+to the server with the service. This is to make information appear legitimately from the victim.
+
+The attacker will have to, at the same time, block ACK packets from being sent from the victim's computer to the machine
+with the service.
+
+At this stage, the attacker can sent fake commands over to the server, whilst acting like it came from the victim
+themselves.
+
+Side note on Telnet: characters are sent one by one, as seen in Wireshark
