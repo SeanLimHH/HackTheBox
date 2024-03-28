@@ -432,3 +432,79 @@ At this stage, the attacker can sent fake commands over to the server, whilst ac
 themselves.
 
 Side note on Telnet: characters are sent one by one, as seen in Wireshark
+
+
+
+Tunneling
+The motivation for attackers using tunneling is to communicate with a specific host.
+Another strong reason is that by doing so, security measures can be bypassed.
+
+SSH tunneling is the most common. However, there are many other forms of tunneling.
+
+ICMP tunneling
+ICMP tunneling is a method to hide other forms of network traffic. Idea is to embed data within the ICMP packet.
+The reason why ICMP is used is because it is common and raises less suspicion; more likely to pass through network
+boundaries.
+
+A way to figure out ICMP tunneling or suspicious behaviour: length of the packets.
+A typical ICMP packets would be around 48 bytes. If the ICMP packet is very large, it is suspicious.
+
+If you inspect the data of the ICMP packets: you can see the contents as well. From there you can see whether
+extra data from an attacker is inside the payload of the ICMP packet(s).
+
+A way to prevent such an attack is to block ICMP requests.
+Otherwise, one can flag out length ICMP packets and perform inspection too.
+
+
+
+HTTP / HTTPS service enumeration
+
+Directory Fuzzing
+Observe the large amounts of get requests in wireshark
+
+Some techniques attackers employ is to set the request from different computers.
+Or stagger the requests sent over a longer time frame.
+
+To prevent such enumeration, we can send false response codes in the configuration to throw off attackers.
+Another approach is to ban the IP addresses once we detect a spam in enumeration.
+
+
+
+Strange HTTP headers
+This is when an attacker sends weird headers where we pick them out.
+This is a basic check where the attacker is trying to spoof the headers of a packet.
+
+One trick to quickly identify failed requests that are possibly malicious: http response code 400.
+
+
+
+HTTP Request Smuggling (CRLF)
+This is a vulnerability that occurs due to discrepancies in how the front end and back end servers interpret
+HTTP requests with regard to the Carriage Return Line Feed (CRLF) characters.
+The idea is to contain another header within the packet via newline characters.
+
+
+Cross-Site Scripting (XSS) and Code Injection Detection
+An example of XSS. Escape the HTML > write JS code that sends data back to your (attacker) servers.
+
+The effect is that because the browsers runs the client-side code, it will execute it.
+
+There are a few types of XSS:
+1. Stored XSS:
+    Vulnerability arises if the data sent by one user is stored in the backend; it is displayed to other users
+    without sanitisation
+    Example: comments section. If an attacker figures that certain HTML tags are embedded in the comment section,
+    the attacker can post a comment but with a malicious JS code. If the server does not check, it will display 
+    the comment
+2. Reflected XSS;
+    Done via user inputs. In the user input, the attacker inputs malicious JS code.
+    The injected script is "reflected" off the web server like an error message or an element on page.
+    Example: phishing on web stores via reflected XSS on search input.
+
+Telltale sign of XSS: a lot of HTTP requests are sent to internal server. 
+
+Solution:
+Always sanitise your user inputs
+Never interpret user input as code.
+
+
