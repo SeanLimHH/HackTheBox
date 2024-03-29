@@ -508,3 +508,65 @@ Always sanitise your user inputs
 Never interpret user input as code.
 
 
+
+SSL Renegotiation Attacks
+HTTPS is secured version of HTTP:
+1. Transport Layer Security (TLS)
+2. Secure Sockets Layer (SSL)
+
+Protocol for HTTPS: connection with server:
+1. Handshake. Here, the decision of which encryption to algorithm to use and certificates are exchanged.
+2. Encryption. Using the agreed-upon encryption algorithm
+3. Further data exchange.
+4. Decryption.
+
+SSL renegotiation attacks are based on HTTPS.
+The idea is that the attack tries to negotiate for the lowest possible encryption standard.
+
+More on HTTPS procedure: After 3-way handshake
+1. Client Hello message is sent to the server after the 3-way handshake.
+Here, information regarding which TLS and SSL versions are supported by the client, a list of encryption
+algorithms, and random data (nonces) to be used in the following steps.
+
+2. Server Hello message is sent to the client.
+This includes server's chosen TLS/ SSL version and encryption algorithm from client's choice. And an
+additional nonce.
+
+3. Certificate Exchange.
+Server sends its digital certificate to the client, proving its identity.
+The certificate contains the server's public key.
+
+4. Key Exchange.
+Client generates a premaster secret, encrypted using public key in 3., in the certificate of the server.
+
+5. Session Key Derivation.
+Both the client and the server use the nonces exchanged in the first two steps and the premaster secret
+to compute the session keys.
+
+These session keys are used for symmetric encryption and decryption of data during the secure connection.
+
+6. Finished messages.
+This is to mark the successful completion of the handshake and derivation of session keys.
+
+7. Secured data exchange.
+At this stage, data can be exchanged securely.
+
+
+
+Finding irregularities in handshakes using Wireshark
+Filter using "ssl.record.content_type == 22"
+
+22 specifies handshake messages only.
+
+For SSL renegotiation attacks, we are looking for
+1. Multiple client hellos
+2. Out-of-order handshake messages. The intention here is to confuse the server into accepting malicious
+parameters
+
+Malicious parameters in this case involve encryption algorithms, digital certificates, or parameters for
+the public key exchange (Diffie-Hellman)
+
+Purposes for such an attack:
+1. Denial of Service. SSL renegotiation does consume a lot of server resources
+2. Exploiting SSL / TLS weakness. Exploit vulnerabilities associated with some encryption algorithms.
+3. Cryptanalysis and Pattern analysis
