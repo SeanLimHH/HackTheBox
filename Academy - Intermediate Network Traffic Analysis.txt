@@ -570,3 +570,82 @@ Purposes for such an attack:
 1. Denial of Service. SSL renegotiation does consume a lot of server resources
 2. Exploiting SSL / TLS weakness. Exploit vulnerabilities associated with some encryption algorithms.
 3. Cryptanalysis and Pattern analysis
+
+
+
+
+DNS Traffic
+Forward lookups: when a device wants to resolve a domain name with an IP address.
+
+DNS forward lookup query process:
+1. Client wants to visit a domain name like facebook.com
+2. Client initiates a DNS forward query
+3. Client checks his local DNS cache
+4. If mapping exists in the local DNS cache, client can just send the query to the IP address.
+5. If mapping does not exist: client sends recursive query to its configured DNS recursive resolver cache
+6. The DNS resolver will check with root servers (queries root servers) to find authoritative name servers
+for the Top-Level Domain (TLD) of the domain name
+7. The root server replies with address of the TLD servers, for DNS resolver to query.
+8. DNS resolver sends the query to the corresponding TLD's authoritative name server. Client expects
+the IP address of the authoritative name server.
+9. DNS resolver queries the IP address of the authoritative name server for the IP address with the domain
+name requested
+10. The DNS resolver then receives the IP address (A or AAAA record) and sends it back to the client that
+initiated the query.
+
+A reverse lookup is a reverse process; we have the IP address and we want the name called Fully Qualified
+Domain Name (FQDN)
+Here, the process is different:
+1. The DNS resolver uses the IP address range to determine where to look. This range is called the reverse
+lookup zone.
+2. The DNS resolver then looks for a PTR record on the reverse lookup zone that corresponds with the IP address.
+3. If a matching PTR is found, the DNS resolver returns the FQDN.
+
+DNS enumeration is one form of action that an attacker can take.
+A sign is large DNS traffic from one host
+
+DNS tunneling is another form of action.
+Example:
+Setup:
+Attacker has access to a compromised machine and wishes to transfer information out without being detected.
+Attacker controls a malicious DNS server outside the network.
+Attacker crafts a malware that can convert data into a form that can be packed into a DNS packet.
+Attacker smuggles this data out to the DNS server via DNS and its protocols.
+
+So a way to tell if DNS tunneling is occurring is to observe the DNS packets; if there is text data on the packets,
+which possibly may be encoded or encrypted, then you can guess that DNS tunneling is occurring.
+
+
+InterPlanetary File System (IPFS)
+https://developers.cloudflare.com/web3/ipfs-gateway/concepts/ipfs/
+A distributed file storage protocol that allows computers all over the globe to store and serve files as part of a
+giant peer-to-peer network.
+
+Any computer, anywhere in the world, can download the IPFS software and start hosting and serving files.
+
+If someone runs IPFS on their computer and uploads a file to the IPFS network, that file can be viewed and downloaded
+by anyone else in the world who is also running IPFS.
+
+This is a P2P method for sharing data.
+
+The point of introducing IPFS is because malicious actors store malicious files on this IPFS servers.
+
+The issue is that it is very difficult to detect due to is P2P nature.
+
+The best thing we can do is observe DNS and or HTTP/HTTPS traffic to URLs of the form:
+https://cloudflare-ipfs.com/ipfs/QmS6eyoGjENZTMxM7UdqBk6Z3U3TZPAVeJXdgp9VK4o1Sz
+
+
+
+For why P2P nature makes detection harder:
+
+A P2P network has no centralisation and hence you cannot just observe all traffic without having control over
+all the nodes.
+
+Also, since the nodes come and go very dynamically, it is hard to capture a traffic within a time frame and map its flow.
+
+Another reason is the encrypted nature of P2P traffic. This severely makes it difficult to observe what data is being
+transmitted through the network.
+
+Side note: it is possible to chain-encode (like triple encode) a string which makes it trickier to decode.
+
