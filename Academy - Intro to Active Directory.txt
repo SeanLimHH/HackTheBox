@@ -1,0 +1,56 @@
+Active Directory (AD) is a directory service for Windows network environments.
+
+It provides authentication and authorisation features but is argued to have vulnerabilities.
+Hence this module.
+
+Fundamentally, AD is a read-only database.
+Anyone can read the AD, regardless of permissions.
+
+It is important to configure AD correctly as it can reveal a lot of sensitive information if not
+carefully configured.
+It is noted that managing an AD properly is a difficult task since fixing one issue can lead to
+another one.
+
+Here, the module will cover the foundations of AD.
+
+Structure: Distributed and hierarchical.
+Purpose is to centrally manage organisation resources - users, groups, devices, file shares, group
+policies, servers, workstations.
+
+Primarily associated with Windows environment.
+
+
+Active Directory Domain Service (AD DS)
+This is a domain service that provides ways to store directory data.
+It stores information like username and passwords. It manages the rights of who can access this data.
+
+
+At the top of AD, is a forest containing one or more domains. Each domain can have their own subdomains.
+
+We call a forest a boundary. Within it are security controls. Each forest can contain multiple domains.
+
+
+Domain
+This is a structure where its contained objects are accessible. The contained objects are users, computers
+and groups.
+
+
+Organisational Unit (OU)
+Each domain can have one or more of these. An OU allows for management of objects.
+These objects are like users, computers, groups...
+Management here more specifically refers to setting policies for these set of groups.
+
+Just visualise for simplicity: multiple forests. Within each forests you have domains. Within each domains
+you have OUs.
+
+
+Concept of trust
+You could have two separate domains each in two separate forests have a trust with each other. A proverbial
+connection.
+This trusts enables only communication between them.
+
+The core concept is that children of one forest, may not necessarily be able to access the children of the
+other forest. However, the "root" of the first forest, since it has a trust with the "root" of the other forest,
+can access the children of the other second forest.
+
+It is also common to see trust set up between multiple domains and or multiple forests

@@ -649,3 +649,32 @@ transmitted through the network.
 
 Side note: it is possible to chain-encode (like triple encode) a string which makes it trickier to decode.
 
+
+
+Telnet and UDP connections
+This is dealing with telnet and UDP traffic.
+Telnet is on the TCP protocol layer. 
+
+Telnet protocol:
+You have a telnet server and client.
+We interact with the telnet client via the terminal driver. Similarly, the application interacts with the telnet server
+via a pseudoterminal driver.
+
+The bridge between the telnet client and server is a Network Virtual Tunnel (NVT)
+
+Telnet is mainly used by older devices and is replaced by SSH nowadays.
+Telnet's service is conventionally at port 23 and is not encrypted. Hence easy to study via wireshark.
+
+One approach we can take is to observe suspicious communication from one Telnet client.
+Follow stream on wireshark and you can see the sequence of data flow.
+
+If you see Telnet traffic over IPv6, it should raise suspicion.
+Telnet is conventionally transmitted over IPv4.
+IPv6 has more security features which also means it can be better for evasion for attackers.
+
+It is theoretically possible for an attacker to use a different protocol for Telnet; like UDP.
+As long as the protocol is on TCP layer, all TCP protocols are possible to be used by Telnet.
+Hence it is good to observe all traffic on the TCP layer just for a possible attack via Telnet.
+
+UDP is a good option for attackers in this case because UDP is faster and some firewalls do not have much
+security scrutiny over UDP traffic
