@@ -54,3 +54,125 @@ other forest. However, the "root" of the first forest, since it has a trust with
 can access the children of the other second forest.
 
 It is also common to see trust set up between multiple domains and or multiple forests
+
+
+Active Directory Terminology
+
+
+Object: any resource. OU, printer, user, domain...
+Attribute: Every object has its own set of attributes.
+Each attribute has an associated LDAP name.
+The LDAP name is used to perform LDAP queries.
+LDAP query is a request made to AD to search for specific information in the AD.
+
+
+
+AD schema
+An AD schema defines what type of objects can exist in the AD and its attributes.
+Examples:
+users in AD belong to "user" class
+computers in AD belong to "computer" class
+Each object has its own information stored in its attributes.
+
+Instantiation is a process where objects are created from a class.
+
+
+
+Domain
+This is a logical group of objects such as computers, users, OUs,
+groups and much more.
+
+Domains, among themselves, can be disconnected. In a way, they operate
+independently.
+
+
+
+Forest
+This is a collection of domains.
+One forest can have multiple domains.
+
+Tree
+A tree contains a few domains as well.
+A forest contains multiple trees.
+Importantly, the tree begins at the single root domain.
+
+
+Container
+A container object contains other objects.
+Its position is fixed in the hierarchy 
+
+
+Leaf
+Leaf objects do not contain other objects
+They are at the end of the hierarchy
+
+
+
+Global Unique Identifier (GUID)
+This is 128 bits. Assigned to every object.
+It is stored in the ObjectGUID attribute.
+
+It is used to identify objects internally.
+
+Searching for objects using GUID is the best way to accurately identify the object
+The value never changes for an object
+
+
+Security principals
+Anything that the OS can authenticate.
+
+In AD, security principals are domain objects that can manage access to other resources within the domain.
+
+For local user accounts and security groups to control access to resources on one computer, it is managed by the
+Security Accounts Manager (SAM).
+
+
+
+Security Identifier (SID)
+Every account, group or process has its own unique SID. This is issued by the domain
+controller and stored in a secure database.
+
+They remain constant for the lifetime of a security principal.
+
+When a user logs in, the system creates an access token that contains the SID.
+This contains the rights of the user, and also contains SID of any groups the user is a member of.
+
+With this access token, it is used to authorise the actions of the user on the computer.
+
+
+
+Distinguished Name (DN)
+Complete path to an object in AD.
+Example:
+(such as cn=bjones, ou=IT, ou=Employees, dc=inlanefreight, dc=local).
+In this example, the user bjones works in the IT department of the company Inlanefreight, and his 
+account is created in an Organizational Unit (OU) that holds accounts for company employees.
+
+CN stands for Common Name, which serves as a way to search up the user object.
+
+
+
+Relative Distinguished Name (RDN)
+Contains the name of the object, relative to the parent container.
+More specifically, of the same level in the naming hierarchy, the RDN is unique and differentiates
+an object from other objects.
+
+
+
+sAMAccountName
+This is the user's log on name. Must be unique, with 20 or fewer characters.
+
+
+
+Domain Controller (DC)
+This is a server that centrally manages security and authentication
+Windows has multiple DC. This spreads out the requests made.
+Having multiple DCs also prevents a single point of failure.
+
+
+
+Global Catalog (GC)
+This is a domain controller.
+The purpose of GC is to store all copies of all objects in an AD forest.
+It allows users and applications to find information about any object in any domain in the forest.
+Mainly enables authentication and object search.
