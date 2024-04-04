@@ -176,3 +176,91 @@ This is a domain controller.
 The purpose of GC is to store all copies of all objects in an AD forest.
 It allows users and applications to find information about any object in any domain in the forest.
 Mainly enables authentication and object search.
+
+
+Read-Only Domain Controller (RODC)
+Purpose is to provide authentication and directory services in remote locations. (online)
+This is a type of domain controller.
+It holds a read-only copy of the AD database.
+
+RODC does not cache user accounts passwords except for the RODC's computer account and RODC KRBTGT.
+
+Note that for the above domain controllers (DC), they are bundled with installation of the OS.
+These concepts regarding settings up a DC are more applicable to commercial flavours of OS rather than
+home flavours.
+
+
+Replication
+This is a process.
+Occurs when changes are made to directory objects on one domain controller (DC).
+Changes made are propagated and synchronized with other domain controllers within the same forest. 
+
+
+Service Principal Name (SPN)
+Associates a service name with logon account.
+Purpose is to uniquely identifies a service instance.
+
+
+Group Policy Object (GPO)
+Virtual collection of policy settings.
+Enforces on groups of users and or computers within an AD.
+Each GPO contains settings which applies to users and or computers.
+
+
+Access Control List (ACL)
+Contains an ordered entries of Access Control Entries (ACEs)
+Purpose is just to contain ACEs for each object.
+
+Access Control Entry (ACE)
+Contains a trustee (user account, group account or logon session) and writes out the access rights that they have
+(for a particular object)
+
+
+System Access Control Lists (SACL)
+Enables administrators to log access attempts to secured objects.
+Linked to ACEs. ACEs determine who will get logged for that object that they attempted to access.
+
+
+Fully Qualified Domain Name (FQDN)
+This is the complete name for a specific host.
+Format: [host name].[domain name].[tld]
+
+This FQDN is what we see in DNS cache in the DNS recursive resolver.
+
+
+Tombstone
+This is just a container in AD that stores deleted AD objects.
+Each deleted object has a duration as to which it will stay in the tombstone. This duration is
+called the tombstone lifetime. It has a isDeleted attribute. Set to TRUE.
+
+Once passed, it is completely removed.
+
+Objects which are tombstone objects have most of their attributes removed.
+
+
+AD Recycle Bin
+Similar to tombstone, but object preserves all its attributes.
+So it is easier to recover.
+Can also configure how long it stays in the Recycle Bin.
+
+
+System Volume (SYSVOL)
+The purpose is to store and replicate essential system files and data that are necessary for functioning
+of the domain.
+It stores GPOs, log on and off scripts
+It synchronises policies among different DCs
+
+
+
+AdminSDHolder, Security Descriptor Propagator (SDProp) and PDC Emulator:
+PDC Emulator ensures synchronity for group policies in the domain. It runs in cycles.
+The point of it is in the case of an attacker that tries to tweak the group policies.
+This PDC Emulator will be a reference point for timing.
+The PDC emulator also handles authentication, and password changes. 
+
+SD prop references the "true" time from PDC emulator when it should "scan" the domain
+to ensure all security policies are enforced.
+
+The AdminSDHolder manages the ACLs for high-security members.
+It ensures that security settings for protected objects like as privileged groups 
+are consistent and secure.
