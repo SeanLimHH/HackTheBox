@@ -264,3 +264,137 @@ to ensure all security policies are enforced.
 The AdminSDHolder manages the ACLs for high-security members.
 It ensures that security settings for protected objects like as privileged groups 
 are consistent and secure.
+
+
+dsHeuristics
+Controls settings within a forest.
+It means directory service Heuristics.
+
+This is a string value. Stored on the 'Directory Service' object within the AD forest.
+
+In this string value, it encapsulates multiple flags and or individual values that corresponds
+to specific configuration settings or feature toggle.
+
+These are often binary flags. In the string itself.
+
+
+adminCount
+It is a flag that marks an object; to be protected by SDProp process.
+
+It is an attribute of individual objects within the AD. 
+
+If the object has this attribute set to 1, the object gets protected by the process.
+
+Attackers like to use this attribute or flag to flag out important objects in AD (like user accounts)
+Because in the case of accounts; it would suggest that the account is of higher importance and privilege.
+
+
+
+Active Directory Users and Computers (ADUC)
+Just a GUI console for managing users, groups, computers and contacts in an AD.
+
+
+ADSI Edit
+A GUI tool to manage objects in AD. Has great privileges, more so than ADUC and should be protected carefully.
+
+
+sIDHistory
+Attribute of objects.
+It stores the previous SID of the object.
+
+The purpose is for migration from one domain to another (migrate user rights)
+
+
+
+NT Directory Service, Directory Information Tree (NTDS.DIT)
+
+Database that stores AD information about user and group objects, membership and password hashes.
+As a result, this is the of very very very large importance to attackers.
+Attackers can actually crack the hashes in this file; hence precaution should be taken before that can happen.
+
+
+
+MSBROWSE
+
+This was used last time. A Microsoft networking protocol. And used in LANs to enable browsing of services.
+
+Nowadays, people stop using this. It is replaced by Server Message Block (SMB) protocol for file and printer sharing,
+and Common Internet File System (CIFS) protocol for the browsing of services.
+
+
+
+Objects
+
+Users are known as leaf objects; as they cannot contain any other objects.
+A user object has both a SID and GUID. It in fact has many attributes.
+
+Contact objects are also leaf objects that store contact information (nothing sensitive).
+No SID, only GUID.
+
+Printers are leaf objects, no SID, only GUID.
+Computers are leaf objects, has SID and GUID.
+
+
+
+
+Shared Folders
+
+These are folders objects that are pointers to a shared folder on a specific computer.
+Very flexible as to who can access it.
+
+They only have GUID, no SID
+
+
+Groups
+
+A group is a container object that contains other objects like users, computers, or even other groups.
+Has both an SID and GUID.
+The purpose of groups is just for easier management of (multiple) objects' access controls
+Useful for auditing group memberships.
+Just think of this as easier management of permissions for users and their access.
+
+
+Organisation Units (OUs)
+
+Also for ease of management. It is a container that stores similar objects. 
+It has a clear hierarchical structure for organising objects
+OUs are useful for managing Group Policy settings across a subset of users or groups.
+
+
+Domain
+
+A domain is a structure of an AD network
+it contains objects like users and computers.
+Has two categories: two container objects: groups and OUs.
+
+Each domain has its own database and set of policies.
+
+
+Domain controllers
+
+As an extension to the above's explanation on domain, Domain Controllers handle authentication
+requests, verify users on the network and controls access rights to resources within the domain.
+
+
+Sites
+
+A site in AD is a set of computers across one or more subnets connected via links.
+Their purpose is to optimise network flow.
+This is done by replicating the directory data between domain controllers within the same site.
+Replication of directory data is necessary, as explained in the above, because we want more than one
+point of failure. Sites help optimise this process of replicating the directory data since they are closer
+in proximity.
+
+
+Built-in
+This is a container. It holds default groups in an AD domain. Predefined when AD domain is created.
+
+
+
+Foreign Security Principals (FSP)
+
+These are objects in AD that represents a security principal that is part of an EXTERNAL forest.
+They are created upon adding a external security principal into the current domain.
+
+It holds the SID of the foreign object (external security principal).
+Windows uses this SID to resolve the object's name
