@@ -398,3 +398,49 @@ They are created upon adding a external security principal into the current doma
 
 It holds the SID of the foreign object (external security principal).
 Windows uses this SID to resolve the object's name
+
+
+Active Directory Functionality
+There are many functionalities within the Active Directory (AD).
+
+There are few Flexible Single Master operation (FMSO) roles.
+
+Each role is responsible for a task in the AD forest.
+Each role is conducted by a software service running on server machines within the network.
+
+There are five roles:
+
+1. Schema Master
+This handles the read / write copy of the AD schema. It defines all attributes that can apply to an
+AD object.
+For example, adding a new attribute for user accounts. This will update the schema, and is done by the
+schema master.
+
+2. Domain Naming Master
+Manages domain names.
+Ensures that two domains in the same forest do not share the same name.
+
+3. Relative ID (RID) Master
+The RID is used to create SID for objects.
+To make the SID unique, they combine RID with SID.
+When a new user account is created, an RID is requested for the user.
+
+4. Primary Domain Controller (PDC) Emulator
+Concept of this is to handle authentication.
+Handles password changes and time.
+
+5. Infrastructure Master
+Updates and maintains references to objects from other domains in the same forest.
+Ensures the integrity of cross-domain object references.
+Used for communication between domains in the same forest.
+
+
+Trusts
+A trust is used to establish forest to forest, or domain to domain authentication.
+The use of this is so that users can access resources in another domain
+
+Transitive property of trust. If this is true, the trust is extended to children.
+Bi-directionality of trust. You can set the trust to be mono-directional or bi-directional.
+Bi-directional enables users from two domains to access each others' resources.
+Mono-directional does not. Only allows one-way.
+
