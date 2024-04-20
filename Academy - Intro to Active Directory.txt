@@ -444,3 +444,53 @@ Bi-directionality of trust. You can set the trust to be mono-directional or bi-d
 Bi-directional enables users from two domains to access each others' resources.
 Mono-directional does not. Only allows one-way.
 
+
+Kerberos
+This is an authentication protocol for domain accounts.
+It is not tied to Windows, and is used in network authentication protocol.
+Used in enterprise networks.
+The protocol is the same for AD and for networks alike - stateless protocol.
+So no session state information is maintained between the client and server.
+It uses a KDC to distribute tickets to users.
+Users then encrypt this ticket with their password.
+KDC attempts to decrypt using the user's password.
+If passes -> issue Ticket Granting Ticket to the user -> user passes this to DC -> 
+issues Ticket Granting Service ticket to user -> This is tied to the service and allows
+authentication to the service.
+
+Kerberos uses port 88 TCP and UDP. Enumeration of this port informs of the location of the
+Domain Controllers.
+
+
+LDAP
+Primary protocol that is used to access and manage objects in the Active Directory.
+Focused on directory data; in contrast to Kerberos (on user authentication).
+They do work together; to retrieve user authentication information stored in directory.
+
+LDAP enables applications to talk to the AD.
+A good analogy in the notes:
+The relationship between AD and LDAP can be compared to Apache and HTTP.
+The same way Apache is a web server that uses the HTTP protocol, Active Directory is a
+directory server that uses the LDAP protocol.
+
+LDAP messages are sent in plaintext; so it is recommended to use TLS encryption in transit.
+
+
+MSRPC
+Microsoft's implementation of Remote Procedure Call.
+This is a protocol that enables Windows-Windows communication.
+More precisely, it enables the applications and or services on both machines to communicate.
+
+
+Explanation of more authentication methods:
+Why there are so many different authentication protocols?:
+Timeline - support for legacy systems.
+
+
+NTLM Authentication
+Note that typically Kerberos is preferred. This is a fallback.
+Challenge-response protocol: 
+1. User sends NEGOTIATE_MESSAGE
+2. CHALLENGE_MESSAGE sent to user (nonce): client must compute a valid response
+3. User sends AUTHENTICATE_MESSAGE
+4. Validate. If validated, grant access.
