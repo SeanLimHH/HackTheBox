@@ -494,3 +494,68 @@ Challenge-response protocol:
 2. CHALLENGE_MESSAGE sent to user (nonce): client must compute a valid response
 3. User sends AUTHENTICATE_MESSAGE
 4. Validate. If validated, grant access.
+
+
+User Accounts
+
+When a user logs in, he gets an access token. This token encodes information like the 
+user's security identity like their username and their group memberships.
+You can see this: Powershell whoami /all returns all relevant information.
+
+Example of SID:
+
+S-1-5-21-3623811015-3361044348-30300820-1013
+Revision Number: 1; Typically 1 is for Windows SIDs
+Identifier Authority: 5-21-3623811015; Identifies authority responsible for issuing the SID. Unique.
+Subauthority Count: 4; Number of subauthorities
+Subauthorities: 3361044348, 30300820, 1013
+Each subauthority represents a specific domain, user, group or security principal
+
+Users can be assigned to groups; the system administrator decides this.
+
+
+Local Accounts
+These are stored locally on a particular server or computer itself.
+The idea of permissions and rights holds, just that it only applies to the computer
+
+There are default local accounts:
+1. Administrator. First account created with a new Windows installation. Cannot be deleted or locked.
+Can be renamed or disabled though.
+
+2. Guest. Disabled by default. Purpose is for temporary access to computer
+
+3. SYSTEM. NT AUTHORITY\SYSTEM. This is automatic; we cannot have access over it.
+It has the highest permissions but runs alone.
+
+4. Network Service. Used by the Service Control Manager to run Windows services.
+Services that run under this account will use its credentials to authenticate itself with other services.
+
+5. Local Service. Also used by the Service Control Manager to run Windows services.
+It has minimal privileges and presents anonymous credentials to the network.
+
+
+Active Directory Groups vs OUs
+Groups is more focused on grouping users and or accounts
+OUs are more generally and can be used to group objects; which includes groups themselves.
+
+
+Groups: Type and Scope
+Type determines the purpose of the group;
+Scope determines where you can use the group in the domain and or the forest.
+
+
+Type:
+Security vs Distribution groups
+Security groups are for ease of assigning permissions; distribution groups are for distribution of information.
+Distribution groups cannot be used for assignment of permissions.
+
+Scope:
+Domain Local: can only manage permissions to domain resources in the domain.
+Global: can be used to grant access to resources in another domain.
+Universal: can be used to manage resources across multiple domains and given permissions to any objects in the
+same forest.
+
+
+Nested group membership
+Consider that a Domain Local Group can be a member of another Domain Local Group in the same domain.
+Users can thus get permissions from the external domain local group, which can be unintentional.
